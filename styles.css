@@ -7,3 +7,102 @@
 #appointment-form .consent-label{display:flex;align-items:flex-start;gap:10px;font-weight:400;line-height:1.5}
 #appointment-form input[type=checkbox]{width:18px;height:18px;flex:0 0 18px;margin:2px 0 0;padding:0;accent-color:var(--teal)}
 #appointment-form .button:disabled{opacity:.65;cursor:wait;transform:none}
+
+/* Чіткі векторні іконки та навігація без перекриття вмісту. */
+.icon{width:21px;height:21px;flex:0 0 auto;vertical-align:middle}
+.logo-icon{width:32px;height:32px;color:var(--teal)}
+.header{position:relative;background:#fff}
+html{scroll-padding-top:20px}
+section[id]{scroll-margin-top:12px}
+.brand{letter-spacing:-.6px}
+.brand-dot{margin-left:-6px}
+.button{min-height:48px;border-radius:10px;box-shadow:0 4px 12px #087c7314}
+.button:hover{box-shadow:0 6px 18px #087c7324}
+.footer-inner>a:last-child{display:inline-flex;align-items:center;gap:8px;min-height:44px}
+.menu-toggle{min-height:44px;align-items:center;gap:9px}
+.menu-cross{display:none}
+.menu-toggle[aria-expanded=true] .menu-bars{display:none}
+.menu-toggle[aria-expanded=true] .menu-cross{display:initial}
+.art-caption .logo-icon{width:28px;height:28px}
+#appointment-form input:not([type=checkbox]){min-height:52px;border-radius:9px;font-size:16px;transition:border-color .2s,box-shadow .2s}
+#appointment-form input:focus{border-color:var(--teal);box-shadow:0 0 0 3px #087c7312}
+#appointment-form .consent-label{cursor:pointer;padding-block:5px}
+#appointment-form .form-message:empty{margin:0}
+@media(max-width:950px){
+  .header-inner{min-height:76px;flex-wrap:wrap;padding-block:12px;gap:0}
+  .menu-toggle:not([hidden]){display:inline-flex}
+  .header nav{width:100%;flex-direction:column;align-items:stretch;gap:4px;padding:14px 0 0}
+  .header nav a{min-height:46px;padding:11px 14px;font-size:15px;border-radius:8px}
+  .header nav a:not(.button):hover{background:var(--mint)}
+  .js .header nav{display:none}
+  .js .header nav.is-open{display:flex}
+  .header nav .button{margin-top:4px}
+  .hero{gap:28px}
+  .services-grid{border:0;gap:14px}
+  .service,.service:first-child,.service:last-child{padding:24px!important;border:1px solid var(--line)!important;border-radius:14px;background:#fbfdfc}
+  .service-number{margin-bottom:22px}
+  .service h3{margin-bottom:12px}
+  .appointment-panel{gap:32px;border:1px solid #d6e8e1}
+}
+@media(max-width:720px){
+  html{scroll-padding-top:16px}
+  .container{width:calc(100% - 40px)}
+  .header-inner{min-height:72px}
+  .brand{font-size:19px;gap:7px}
+  .brand .logo-icon{width:29px;height:29px}
+  .menu-toggle{font-size:13px;padding:8px 10px}
+  .hero{padding-block:30px 32px;gap:24px}
+  h1{font-size:clamp(36px,10.5vw,45px);letter-spacing:-1.6px;line-height:1.12;margin-bottom:18px}
+  h2{font-size:clamp(29px,8.2vw,36px);line-height:1.17;letter-spacing:-1.1px;margin-bottom:18px}
+  h3{font-size:20px}
+  .eyebrow{font-size:10px;letter-spacing:1.3px;margin-bottom:16px}
+  .lead{font-size:15px;line-height:1.65;margin-bottom:22px}
+  .hero-copy .button{min-width:0;width:100%}
+  .hero-note{margin-top:12px;font-size:11px}
+  .hero-art{height:220px;border-radius:100px 100px 16px 16px;max-width:390px}
+  .tooth{height:210px;width:200px;transform:rotate(-8deg) translate(18px,-8px)}
+  .art-orbit{height:195px;width:195px}
+  .art-caption{left:14px;bottom:19px;padding:9px 12px;font-size:11px;gap:8px}
+  .art-caption .logo-icon{width:22px;height:22px}
+  .star-one{top:25px;right:32px;font-size:28px}
+  .star-two{bottom:85px;left:30px;font-size:22px}
+  .art-label{font-size:7px;right:12px;bottom:8px}
+  .section{padding-block:40px}
+  .section-heading{margin-bottom:22px}
+  .section-heading>p,.about-grid>div>p,.faq-grid>div>p{font-size:15px}
+  .service,.service:first-child,.service:last-child{padding:21px!important}
+  .services-grid{gap:12px}
+  .service-number{margin-bottom:16px}
+  .service p{font-size:14px;line-height:1.65}
+  .about-grid,.faq-grid,.contacts{gap:22px}
+  .about-grid .about-intro{font-size:20px;line-height:1.5}
+  details{padding:18px 0}
+  summary{font-size:15px;min-height:28px;align-items:center}
+  details p{margin-right:0;line-height:1.65}
+  .appointment-panel{padding:25px 20px;border-radius:16px;gap:22px}
+  .appointment-panel>div>p{font-size:15px}
+  .appointment-panel>div>.form-disclaimer{font-size:13px;margin-bottom:0}
+  .form-disclaimer{padding-left:12px;border-left:2px solid var(--teal);line-height:1.65}
+  #appointment-form label{font-size:14px}
+  #appointment-form .consent-label{font-size:12px;line-height:1.6}
+  #appointment-form .button{width:100%}
+  .field-error{min-height:16px;font-size:12px;margin-bottom:12px}
+  .contact-data dl>div{grid-template-columns:1fr;gap:5px;padding:16px 0}
+  .contact-data dd{font-size:16px}
+  .contact-data small{font-size:12px}
+  .demo-label{font-size:11px;line-height:1.6}
+  .footer{padding-block:24px}
+  .footer-inner{gap:16px}
+  .footer p{font-size:12px;line-height:1.7}
+}
+@media(min-width:721px) and (max-width:950px){
+  .hero{padding-block:44px 48px}
+  h1{font-size:46px;letter-spacing:-2px}
+  .hero-art{height:350px}
+  .tooth{width:260px;height:300px}
+  .art-orbit{width:270px;height:270px}
+  .section{padding-block:56px}
+  .faq-grid,.about-grid,.contacts{gap:30px}
+  .appointment-panel{padding:32px;gap:28px}
+}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
