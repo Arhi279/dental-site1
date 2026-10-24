@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Дентал Студіо — навчальний демонстраційний сайт вигаданої стоматології.">
+  <title>Дентал Студіо — турбота про вашу усмішку</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Перейти до вмісту</a>
+  <header class="header">
+    <div class="container header-inner">
+      <a class="brand" href="#home" aria-label="Дентал Студіо — на початок"><span class="brand-icon" aria-hidden="true">✳</span> Дентал Студіо<span class="brand-dot">.</span></a>
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="navigation" hidden>Меню <span aria-hidden="true">☰</span></button>
+      <nav id="navigation" aria-label="Головна навігація">
+        <a href="#services">Послуги</a><a href="#about">Про клініку</a><a href="#faq">Запитання</a><a href="#contacts">Контакти</a><a class="button button-small" href="#appointment">Записатися <span aria-hidden="true">↗</span></a>
+      </nav>
+    </div>
+  </header>
+  <main id="main">
+    <section id="home" class="hero container">
+      <div class="hero-copy">
+        <p class="eyebrow"><span class="status-dot"></span> СТОМАТОЛОГІЯ З ТУРБОТОЮ</p>
+        <h1>Ваша усмішка.<br>Наша <span>турбота.</span></h1>
+        <p class="lead">Здорові зуби починаються з уваги до себе. Знайомтеся з «Дентал Студіо» — простором спокійної та зрозумілої стоматології.</p>
+        <a class="button" href="#appointment">Записатися <span aria-hidden="true">↗</span></a>
+        <p class="hero-note">Навчальний проєкт · Вигадана клініка</p>
+      </div>
+      <div class="hero-art" aria-hidden="true">
+        <div class="art-orbit"></div><span class="art-star star-one">✦</span><span class="art-star star-two">✧</span>
+        <svg class="tooth" viewBox="0 0 300 340" fill="none"><defs><linearGradient id="tooth-fill" x1="70" y1="50" x2="250" y2="300" gradientUnits="userSpaceOnUse"><stop stop-color="white"/><stop offset="1" stop-color="#cce9e4"/></linearGradient></defs><path d="M151 58C113 41 62 42 49 86C35 133 65 171 77 213C88 251 90 298 111 298C134 298 127 218 151 218C175 218 168 298 191 298C212 298 215 250 226 213C238 171 267 132 253 86C240 42 189 41 151 58Z" fill="url(#tooth-fill)" stroke="white" stroke-width="3"/><path d="M109 73C127 77 143 85 169 81" stroke="#b2dad2" stroke-width="6" stroke-linecap="round"/><path d="M72 105C67 125 74 142 80 151" stroke="white" stroke-width="9" stroke-linecap="round"/></svg>
+        <div class="art-caption"><span>✳</span> Турбота починається<br>з першої розмови</div><span class="art-label">DENTAL STUDIO / DEMO</span>
+      </div>
+    </section>
+    <section id="services" class="section container">
+      <div class="section-heading"><div><p class="eyebrow">01 / ПОСЛУГИ</p><h2>Для здоров’я<br>вашої усмішки</h2></div><p>Від щоденної профілактики до вирівнювання зубів. План лікування завжди потребує індивідуальної консультації.</p></div>
+      <div class="services-grid">
+        <article class="service"><span class="service-number">01 <span aria-hidden="true">↗</span></span><h3>Лікування карієсу</h3><p>Відновлення уражених тканин зуба та його форми. Метод лікування визначає стоматолог після огляду.</p></article>
+        <article class="service"><span class="service-number">02 <span aria-hidden="true">↗</span></span><h3>Професійна гігієна</h3><p>Видалення зубних відкладень і рекомендації для домашнього догляду за зубами та яснами.</p></article>
+        <article class="service"><span class="service-number">03 <span aria-hidden="true">↗</span></span><h3>Відбілювання</h3><p>Освітлення відтінку зубів після оцінки стану емалі. Можливість процедури й результат індивідуальні.</p></article>
+        <article class="service"><span class="service-number">04 <span aria-hidden="true">↗</span></span><h3>Ортодонтія</h3><p>Корекція положення зубів і прикусу. Вибір способу та тривалості лікування — після діагностики.</p></article>
+      </div>
+    </section>
+    <section id="about" class="about section"><div class="container about-grid"><div><p class="eyebrow">02 / ПРО КЛІНІКУ</p><h2>Більше уваги.<br>Більше розуміння.</h2><p class="demo-label">Концепція вигаданої клініки</p></div><div><p class="about-intro">«Дентал Студіо» — навчальна концепція стоматології, де в центрі уваги людина та її комфорт.</p><p>Ми уявляємо прийом, який починається з розмови: про ваші побажання, запитання та відчуття. Зрозумілі пояснення допомагають ухвалювати зважені рішення.</p><div class="about-values"><span>Зрозумілий план</span><span>Уважне спілкування</span><span>Профілактика</span></div></div></div></section>
+    <section id="faq" class="section container faq-grid"><div><p class="eyebrow">03 / ЗАПИТАННЯ ТА ВІДПОВІДІ</p><h2>Давайте<br>розберемося.</h2><p>Кілька відповідей перед першим візитом.</p></div><div class="faq-list">
+      <details><summary>Як підготуватися до першого прийому?</summary><p>Підготуйте свої запитання, список ліків, які приймаєте, та повідомте лікаря про алергії. Якщо маєте попередні знімки або висновки, візьміть їх із собою.</p></details>
+      <details><summary>Як часто потрібна професійна гігієна?</summary><p>Періодичність визначає стоматолог з огляду на стан зубів і ясен, особливості догляду та індивідуальні ризики.</p></details>
+      <details><summary>Чи всім підходить відбілювання?</summary><p>Ні. Спочатку потрібні огляд і оцінка стану зубів та ясен. Лікар пояснить можливі обмеження й очікуваний результат.</p></details>
+      <details><summary>Чи можна записатися через цей сайт?</summary><p>Ні. Це навчальний сайт вигаданої клініки. Форма лише демонструє перевірку полів: вона нічого не надсилає та не створює запис на прийом.</p></details>
+    </div></section>
+    <section id="appointment" class="section container"><div class="appointment-panel"><div><p class="eyebrow">04 / ПЕРШИЙ КРОК</p><h2>Знайдіть час<br>для усмішки.</h2><p>Спробуйте заповнити демонстраційну форму.</p><p class="form-disclaimer" id="demo-note">Це демонстрація. Не вводьте справжні персональні дані. Дані не зберігаються й не надсилаються; запис на прийом не створюється.</p></div>
+      <form id="appointment-form" aria-describedby="demo-note" novalidate>
+        <label for="name">Ваше ім’я</label><input id="name" name="name" type="text" placeholder="Наприклад, Олена" maxlength="80" required aria-describedby="name-error"><p class="field-error" id="name-error"></p>
+        <label for="phone">Телефон</label><input id="phone" name="phone" type="tel" inputmode="tel" placeholder="Наприклад, 000 000 00 00" maxlength="25" required aria-describedby="phone-error"><p class="field-error" id="phone-error"></p>
+        <button class="button" type="submit">Перевірити демоформу <span aria-hidden="true">↗</span></button><p id="form-message" class="form-message" role="status" aria-live="polite"></p>
+      </form></div></section>
+    <section id="contacts" class="section container contacts"><div><p class="eyebrow">05 / КОНТАКТИ</p><h2>Усе починається<br>з контакту.</h2></div><div class="contact-data"><p class="demo-label">Лише демонстраційні дані — клініка вигадана</p><dl><div><dt>Адреса</dt><dd>м. Приклад, вул. Усмішки, 1<br><small>Вигадана адреса</small></dd></div><div><dt>Телефон</dt><dd>+380 (00) 000-00-00<br><small>Недійсний демонстраційний номер</small></dd></div><div><dt>Електронна пошта</dt><dd>hello@dental.example<br><small>Демонстраційна адреса</small></dd></div></dl></div></section>
+  </main>
+  <footer class="footer"><div class="container footer-inner"><a class="brand" href="#home">✳ Дентал Студіо.</a><p>Навчальний демонстраційний сайт.<br>Вигадана клініка. Медичні послуги не надаються.</p><a href="#home">Нагору ↑</a></div></footer>
+</body>
+</html>
