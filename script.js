@@ -15,7 +15,15 @@ menuButton.addEventListener('click', () => {
   navigation.classList.toggle('is-open', open);
 });
 navigation.addEventListener('click', (event) => {
-  if (event.target.closest('a')) closeMenu();
+  const link = event.target.closest('a');
+  if (link) {
+    closeMenu();
+    const target = document.querySelector(link.getAttribute('href'));
+    if (target) {
+      target.setAttribute('tabindex', '-1');
+      target.focus({ preventScroll: true });
+    }
+  }
 });
 document.addEventListener('keydown', (event) => {
   if (event.key === 'Escape' && menuButton.getAttribute('aria-expanded') === 'true') {
@@ -23,7 +31,10 @@ document.addEventListener('keydown', (event) => {
     menuButton.focus();
   }
 });
-window.matchMedia('(max-width: 720px)').addEventListener('change', closeMenu);
+document.addEventListener('click', (event) => {
+  if (!event.target.closest('.header')) closeMenu();
+});
+window.matchMedia('(max-width: 950px)').addEventListener('change', closeMenu);
 
 // Заявка надсилається лише після перевірки полів та згоди.
 const form = document.querySelector('#appointment-form');
