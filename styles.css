@@ -106,3 +106,19 @@ section[id]{scroll-margin-top:12px}
   .appointment-panel{padding:32px;gap:28px}
 }
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+
+/* Мобільна шапка: один рядок, незалежна панель навігації. */
+@media(min-width:951px){.header .menu-toggle{display:none}}
+@media(max-width:950px){
+  html{scroll-padding-top:84px}
+  .header{position:sticky;top:0;z-index:10;background:#fff;isolation:isolate}
+  .header .header-inner{height:71px;min-height:0;padding-block:0;display:flex;flex-wrap:nowrap;align-items:center;justify-content:space-between;gap:12px}
+  .header .brand{min-width:0;flex-shrink:0;line-height:1.2}
+  .header .menu-toggle:not([hidden]){display:inline-flex;flex:0 0 auto;align-items:center;justify-content:center;min-height:44px;max-height:44px;margin:0;background:#fff}
+  .header .menu-toggle .icon{width:22px;height:22px;display:block}
+  .header nav{position:absolute;top:100%;left:0;right:0;width:auto;margin:0;padding:10px 20px 14px;background:#fff;border-bottom:1px solid var(--line);box-shadow:0 12px 18px #153b490d;max-height:calc(100vh - 72px);max-height:calc(100dvh - 72px);overflow-y:auto;overscroll-behavior:contain}
+  .header nav a{min-height:44px;padding:10px 12px;line-height:1.5}
+  .header nav .button{margin-top:2px}
+  .header:has(.menu-toggle[hidden]) .header-inner{height:auto;min-height:71px;flex-wrap:wrap;padding-block:12px}
+  .header:has(.menu-toggle[hidden]) nav{position:static;max-height:none;box-shadow:none;border:0;width:100%;padding-inline:0}
+}
