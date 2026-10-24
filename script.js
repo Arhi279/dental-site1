@@ -25,37 +25,71 @@ document.addEventListener('keydown', (event) => {
 });
 window.matchMedia('(max-width: 720px)').addEventListener('change', closeMenu);
 
-// Перевірка відбувається локально. Запитів до сервера та збереження даних немає.
+// Заявка надсилається лише після перевірки полів та згоди.
 const form = document.querySelector('#appointment-form');
 const nameInput = document.querySelector('#name');
 const phoneInput = document.querySelector('#phone');
+const consentInput = document.querySelector('#consent');
 const message = document.querySelector('#form-message');
+const submitButton = form.querySelector('button[type="submit"]');
+let submitting = false;
 function setError(input, text) {
   input.setAttribute('aria-invalid', String(Boolean(text)));
   document.querySelector(`#${input.id}-error`).textContent = text;
 }
-form.addEventListener('submit', (event) => {
+form.addEventListener('submit', async (event) => {
   event.preventDefault();
+  if (submitting) return;
   message.textContent = '';
-  const nameError = nameInput.value.trim() ? '' : 'Введіть ім’я (можна вигадане).';
+  const name = nameInput.value.trim();
+  const nameError = name.length >= 2 && /\p{L}/u.test(name) ? '' : 'Введіть ім’я: щонайменше 2 символи, з літерами.';
   const phone = phoneInput.value.trim();
   const digitCount = phone.replace(/\D/g, '').length;
-  const phoneError = !phone ? 'Введіть демонстраційний телефон.' :
+  const phoneError = !phone ? 'Введіть номер телефону.' :
     (!/^\+?[\d\s()\-]+$/.test(phone) || digitCount < 10 || digitCount > 15)
-      ? 'Введіть від 10 до 15 цифр. Можна використати пробіли, +, дужки та дефіси.' : '';
-  setError(nameInput, nameError);
-  setError(phoneInput, phoneError);
-  if (nameError || phoneError) {
-    message.textContent = 'Це демонстрація. Заявку не надіслано. Перевірте позначені поля.';
-    (nameError ? nameInput : phoneInput).focus();
+      ? 'Введіть від 10 до 15 цифр. Дозволено + на початку, пробіли, дужки та дефіси.' : '';
+  const consentError = consentInput.checked ? '' : 'Потрібна згода на обробку та передавання даних.';
+  const fields = [[nameInput, nameError], [phoneInput, phoneError], [consentInput, consentError]];
+  fields.forEach(([input, error]) => setError(input, error));
+  const invalid = fields.find(([, error]) => error);
+  if (invalid) {
+    message.textContent = 'Перевірте позначені поля. Заявку не надіслано.';
+    invalid[0].focus();
     return;
   }
-  message.textContent = 'Це демонстрація. Поля заповнено коректно, але заявку не надіслано. Дані не збережено, запис на прийом не створено.';
-  form.reset();
+  submitting = true;
+  submitButton.disabled = true;
+  form.setAttribute('aria-busy', 'true');
+  message.textContent = 'Надсилаємо заявку…';
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 20000);
+  const data = new FormData(form);
+  data.set('name', name);
+  data.set('phone', phone);
+  try {
+    const response = await fetch(form.action, {
+      method: 'POST',
+      body: data,
+      headers: { Accept: 'application/json' },
+      signal: controller.signal
+    });
+    if (!response.ok) throw new Error('Submission rejected');
+    message.textContent = 'Дякуємо! Вашу заявку надіслано';
+    form.reset();
+  } catch (error) {
+    message.textContent = error.name === 'AbortError'
+      ? 'Час очікування вичерпано. Не вдалося підтвердити надсилання. Перевірте з’єднання та спробуйте пізніше.'
+      : 'Не вдалося надіслати заявку. Перевірте з’єднання та спробуйте ще раз пізніше.';
+  } finally {
+    clearTimeout(timeout);
+    submitting = false;
+    submitButton.disabled = false;
+    form.removeAttribute('aria-busy');
+  }
 });
-[nameInput, phoneInput].forEach((input) => {
+[nameInput, phoneInput, consentInput].forEach((input) => {
   input.addEventListener('input', () => {
     setError(input, '');
-    message.textContent = '';
+    if (!submitting) message.textContent = '';
   });
 });
