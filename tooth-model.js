@@ -2,7 +2,10 @@
  * Original procedural, single-root incisor for Dental Studio.
  * Curved surfaces and shared cut boundaries are designed for education rather
  * than diagnosis. This is not a patient scan or a clinically validated atlas.
- * No third-party geometry, textures or medical measurements are used.
+ * No third-party geometry or textures are used. Proportion guide: the standard
+ * Wheeler teaching averages for a maxillary central incisor (crown 10.5 mm,
+ * root 13 mm, mesiodistal 8.5 mm, labiolingual 7 mm). These are illustrative
+ * ratios, not measurements of an individual tooth or clinical validation.
  */
 export function createTooth(THREE) {
   const cutaway = new THREE.Group();
@@ -10,35 +13,38 @@ export function createTooth(THREE) {
   cutaway.name = 'Incisor — anatomical section';
   intact.name = 'Incisor — exterior';
 
-  // Canonical longitudinal profiles: [height, mesiodistal radius, depth].
-  // The upper cap is a superelliptic blade: it closes gradually over a broad,
-  // softly rounded incisal contour, rather than collapsing a wide ring at once.
+  // The tooth is a maxillary central incisor. The taller, deeper crown and
+  // crown/root ratio follow teaching averages; all scene units remain arbitrary.
   const enamel = {
-    profile:[[0,.445,.36],[.16,.482,.385],[.40,.58,.405],[.75,.70,.37],
-      [1.1,.765,.28],[1.35,.775,.17],[1.43,.775,.115]],
-    cap:{base:1.43,top:1.67,width:.775,depth:.115,power:6}, crown:true
+    profile:[[0,.600,.535],[.18,.624,.576],[.45,.676,.60],[.80,.716,.56],
+      [1.10,.730,.46],[1.35,.724,.31],[1.58,.695,.135]],
+    cap:{base:1.58,top:1.80,width:.695,depth:.135,power:3.4}, crown:true
   };
   const dentin = {
-    profile:[[-2.20,0,0],[-2.185,.025,.028],[-2.16,.052,.055],[-2.14,.058,.064],[-2.11,.075,.081],
-      [-1.98,.105,.112],[-1.75,.155,.158],[-1.40,.22,.216],[-1.0,.29,.272],
-      [-.6,.35,.31],[-.2,.41,.338],[0,.445,.36],[.16,.462,.364],
-      [.40,.525,.34],[.75,.615,.279],[1.1,.665,.152],[1.23,.65,.09]],
-    cap:{base:1.23,top:1.46,width:.65,depth:.09,power:5},
-    tip:{bottom:-2.20,top:-2.14,width:.058,depth:.064}, crown:true
+    profile:[[-2.215,0,0],[-2.19,.024,.045],[-2.15,.046,.085],[-2.10,.055,.103],
+      [-2.03,.078,.130],[-1.84,.145,.199],[-1.60,.219,.273],[-1.30,.303,.345],
+      [-.95,.399,.418],[-.55,.502,.475],[-.20,.566,.512],[0,.600,.535],
+      [.18,.592,.530],[.45,.612,.515],[.80,.637,.445],[1.10,.620,.337],
+      [1.35,.597,.190],[1.43,.572,.118]],
+    cap:{base:1.43,top:1.61,width:.572,depth:.118,power:3},
+    tip:{bottom:-2.215,top:-2.10,width:.055,depth:.103}, crown:true
   };
   const cementum = {
-    profile:[[-2.22,0,0],[-2.20,.043,.046],[-2.17,.060,.064],[-2.15,.068,.073],[-2.12,.083,.09],
-      [-1.98,.119,.126],[-1.75,.17,.173],[-1.40,.235,.231],[-1.0,.305,.287],
-      [-.6,.365,.325],[-.2,.424,.352],[-.08,.433,.354],[0,.445,.36]],
-    tip:{bottom:-2.22,top:-2.15,width:.068,depth:.073}, crown:false
+    profile:[[-2.23,0,0],[-2.20,.029,.051],[-2.16,.055,.092],[-2.115,.069,.117],
+      [-2.03,.093,.145],[-1.84,.160,.214],[-1.60,.234,.288],[-1.30,.318,.36],
+      [-.95,.414,.433],[-.55,.517,.49],[-.20,.578,.524],[0,.600,.535]],
+    tip:{bottom:-2.23,top:-2.115,width:.069,depth:.117}, crown:false
   };
   const pulp = {
-    profile:[[-2.20,0,0],[-2.17,.008,.008],[-2.10,.012,.012],[-1.98,.017,.016],
-      [-1.75,.024,.022],[-1.40,.032,.028],[-1.0,.041,.034],[-.6,.051,.040],
-      [-.2,.071,.049],[0,.092,.058],[.3,.135,.074],[.65,.17,.075],
-      [.90,.165,.062],[1.04,.145,.038]],
-    cap:{base:1.04,top:1.19,width:.145,depth:.038,power:4}, crown:true, pulp:true
+    profile:[[-2.215,0,0],[-2.19,.004,.006],[-2.10,.010,.013],[-2.03,.016,.021],
+      [-1.84,.023,.029],[-1.60,.030,.037],[-1.30,.038,.045],[-.95,.049,.053],
+      [-.55,.060,.061],[-.20,.079,.070],[0,.102,.083],[.30,.143,.108],
+      [.65,.183,.113],[1.0,.192,.085],[1.12,.166,.052]],
+    cap:{base:1.12,top:1.34,width:.166,depth:.052,power:3}, crown:true, pulp:true
   };
+  // One exterior curve crosses the CEJ; using separate endpoint splines caused
+  // the old crown/root lighting band even when the positions matched exactly.
+  const exteriorProfile=[...cementum.profile.slice(0,-1),...enamel.profile];
   const surfaces = { enamel, dentin, pulp, root:cementum };
   const minY = surface => surface.profile[0][0];
   const maxY = surface => surface.cap ? surface.cap.top : surface.profile.at(-1)[0];
@@ -73,21 +79,26 @@ export function createTooth(THREE) {
       const depthSlope=-(last[2]-before[2])/(last[0]-before[0])*(cap.top-cap.base)/cap.depth;
       return axis===1 ? cap.width*Math.pow(q,1/cap.power) : cap.depth*Math.sqrt(q)*Math.exp(-depthSlope*t);
     }
-    return sampleProfile(surface.profile,y,axis);
+    const profile=(surface===enamel||surface===cementum)?exteriorProfile:surface.profile;
+    return sampleProfile(profile,y,axis);
   }
   function radius(surface,y,axis) {
     const outer=rawRadius(surface,y,axis);
-    if(surface===cementum && y>=-2.16 && y<=0) {
-      const coat=.015*smooth(0,.16,-y);
-      const guaranteed=rawRadius(dentin,y,axis)+coat;
-      const blend=smooth(-2.16,-2.08,y);
-      return outer+(guaranteed-outer)*blend;
+    // A thin cementum coat smoothly vanishes at the CEJ. Dentin must be inside
+    // the shared exterior everywhere, including the root's rounded apical cap.
+    if(surface===dentin && y<=0) {
+      const coat=.014*smooth(0,.20,-y);
+      return Math.min(outer,Math.max(0,rawRadius(cementum,y,axis)-coat));
     }
     return outer;
   }
   function centre(y) {
-    const root=clamp(-y/2.22,0,1);
-    return .12*root*root*root;
+    const root=clamp(-y/2.23,0,1);
+    return .19*root*root*(.65+.35*root);
+  }
+  function centreZ(y) {
+    const root=clamp(-y/2.23,0,1);
+    return -.075*root*root*root;
   }
   function point(surface,y,angle) {
     const rx=radius(surface,y,1),rz=radius(surface,y,2);
@@ -95,36 +106,39 @@ export function createTooth(THREE) {
     const crown=smooth(0,.32,y);
     // A rounded triangular/ovoid cervical section gradually becomes a broad
     // rounded rectangle toward the incisal third, without sharp box edges.
-    const exponent=1-.16*crown;
+    const exponent=1.015-.025*crown;
     const u=Math.sign(sine)*Math.pow(Math.abs(sine),exponent);
     const v=Math.sign(cosine)*Math.pow(Math.abs(cosine),exponent);
     const active=rx>0||rz>0;
-    const distal=1-.035*crown*smooth(0,1,u);
-    const x=centre(y)+rx*u*distal;
-    let z=rz*v;
+    const distal=1-.025*crown*smooth(0,1,u);
+    const mesialFullness=1+.012*crown*Math.exp(-(((u+.55)/.32)**2));
+    const x=centre(y)+rx*u*distal*mesialFullness;
+    let z=centreZ(y)+rz*v;
+    // Relief and its first derivative vanish at the CEJ: a hard y>0 gate
+    // previously introduced a displacement jump and a dark lighting stripe.
     if(y>0 && active) {
       const centreFace=1-u*u;
       if(cosine>=0) {
         // Restrained labial developmental lobes: a few hundredths of a unit.
-        z*=1+.022*Math.cos(3*Math.PI*u)*Math.exp(-(((y-.75)/.55)**2));
+        z+=crown*rz*v*.018*Math.cos(3*Math.PI*(u+.025))*Math.exp(-(((y-.82)/.62)**2));
       } else {
         const fossa=.18*Math.exp(-(((y-.86)/.38)**2))*centreFace;
         const cingulum=.18*Math.exp(-(((y-.20)/.19)**2))*centreFace;
         const marginal=.04*Math.exp(-(((Math.abs(u)-.8)/.15)**2))*Math.exp(-(((y-.75)/.6)**2));
-        z*=1-fossa+cingulum+marginal;
+        z+=crown*rz*v*(-fossa+cingulum+marginal);
       }
     }
     // CEJ curves around the tooth rather than forming a horizontal hard band.
     // It is identical for adjoining tissues and decays smoothly in the root.
-    const cej=.045*Math.cos(2*angle)*Math.exp(-((y/.24)**2));
+    const cej=.065*(Math.cos(2*angle)+.16*Math.sin(angle))*Math.exp(-((y/.32)**2));
     const edge=surface.cap ? smooth(surface.cap.base,maxY(surface),y) : 0;
     // A gently sloping, almost flat incisal silhouette with a rounder distal
     // corner; shallow scalloping is an illustrative contour, not a sharp tip.
     let incisal=0;
     if(surface.cap && y<=maxY(surface)) {
       const incisalX=rx*u/surface.cap.width;
-      incisal=edge*(-.025*incisalX-.015*incisalX*incisalX+.009*Math.cos(3*Math.PI*incisalX));
-      if(surface.pulp) incisal=edge*.028*Math.cos(2*Math.PI*incisalX);
+      incisal=edge*(-.043*incisalX-.025*incisalX*incisalX+.004*Math.cos(3*Math.PI*incisalX));
+      if(surface.pulp) incisal=edge*.014*Math.cos(2*Math.PI*incisalX);
     }
     return [x,y+cej+incisal,z];
   }
@@ -132,7 +146,7 @@ export function createTooth(THREE) {
   // Every tissue uses precisely the same canonical y levels. Inner boundaries
   // call the same point evaluator as the adjacent outer boundary, so strip
   // edges coincide numerically even along the curved cervical/incisal region.
-  const levels=new Set([-2.22,-2.20,0]);
+  const levels=new Set([-2.23,-2.215,-.12,-.06,0,.06,.12]);
   for(const surface of Object.values(surfaces)) {
     surface.profile.forEach(row=>levels.add(row[0]));
     if(surface.cap) {
@@ -161,7 +175,24 @@ export function createTooth(THREE) {
     pulp:makeMaterial('#bd7272',.62),
     root:makeMaterial('#dfd4bc',.52)
   };
-  exteriorMaterials.enamel.vertexColors=true;
+  // Both exterior tissues meet with the same effective colour and roughness.
+  // The transition is vertex-based, so there is no texture or transparency cost.
+  for(const part of ['enamel','root']) {
+    const material=exteriorMaterials[part];
+    material.vertexColors=true;
+    material.onBeforeCompile=shader=>{
+      shader.vertexShader=shader.vertexShader.replace('#include <common>',
+        '#include <common>\nattribute float tissueRoughness; varying float vTissueRoughness;');
+      shader.vertexShader=shader.vertexShader.replace('#include <begin_vertex>',
+        '#include <begin_vertex>\nvTissueRoughness=tissueRoughness;');
+      shader.fragmentShader=shader.fragmentShader.replace('#include <common>',
+        '#include <common>\nvarying float vTissueRoughness;');
+      shader.fragmentShader=shader.fragmentShader.replace('#include <roughnessmap_fragment>',
+        '#include <roughnessmap_fragment>\nroughnessFactor=vTissueRoughness;');
+    };
+    material.customProgramCacheKey=()=> 'tooth-cervical-gradient-v1';
+  }
+  const cervicalColour=new THREE.Color('#e5ddca');
   const sectionMaterials={
     enamel:makeMaterial('#ede9da',.53),
     dentin:makeMaterial('#ccb28a',.69),
@@ -172,15 +203,21 @@ export function createTooth(THREE) {
   function mesh(group,positions,indices,part,section=false) {
     const geometry=new THREE.BufferGeometry();
     geometry.setAttribute('position',new THREE.Float32BufferAttribute(positions,3));
-    if(part==='enamel' && !section) {
-      // A restrained cervical tint softens the natural enamel/cementum change.
-      // Vertex colour avoids texture downloads and costly transparent passes.
-      const tint=[];
+    if((part==='enamel'||part==='root') && !section) {
+      const tint=[],roughness=[];
+      const base=exteriorMaterials[part].color;
       for(let i=0;i<positions.length;i+=3) {
-        const t=smooth(0,.65,positions[i+1]);
-        tint.push(1,.982+.018*t,.942+.058*t);
+        // CEJ is angular; measure distance to its curved line rather than y=0.
+        const x=positions[i],y=positions[i+1],z=positions[i+2];
+        const angle=Math.atan2(x, z);
+        const cej=.065*(Math.cos(2*angle)+.16*Math.sin(angle));
+        const t=smooth(0,part==='enamel'?.52:.42,Math.abs(y-cej));
+        const target=cervicalColour.clone().lerp(base,t);
+        tint.push(target.r/base.r,target.g/base.g,target.b/base.b);
+        roughness.push(.42+(exteriorMaterials[part].roughness-.42)*t);
       }
       geometry.setAttribute('color',new THREE.Float32BufferAttribute(tint,3));
+      geometry.setAttribute('tissueRoughness',new THREE.Float32BufferAttribute(roughness,1));
     }
     geometry.setIndex(indices);geometry.computeVertexNormals();
     if(section) {
@@ -228,13 +265,32 @@ export function createTooth(THREE) {
       indices.push(a,b,c,b,d,c);
     }
     const curved=mesh(group,positions,indices,part);
+    const normal=curved.geometry.attributes.normal;
+    const epsilon=.0002;
+    function normalPoint(y,angle) {
+      // Continue the same exterior through the CEJ when computing derivatives.
+      let tissueSurface=surface;
+      if(surface===enamel&&y<0)tissueSurface=cementum;
+      if(surface===cementum&&y>0)tissueSurface=enamel;
+      return new THREE.Vector3(...point(tissueSurface,
+        clamp(y,minY(tissueSurface),maxY(tissueSurface)),angle));
+    }
+    for(let i=0;i<rows.length;i++)for(let j=0;j<=angular;j++) {
+      const y=rows[i],angle=start+sweep*j/angular;
+      const tangentA=normalPoint(y,angle+epsilon).sub(normalPoint(y,angle-epsilon));
+      const tangentY=normalPoint(y+epsilon,angle).sub(normalPoint(y-epsilon,angle));
+      const n=tangentA.cross(tangentY);
+      if(n.lengthSq()<1e-18) n.set(0,y<0?-1:1,0);
+      n.normalize();normal.setXYZ(i*stride+j,n.x,n.y,n.z);
+    }
+    normal.needsUpdate=true;
     if(!section) return curved;
     for(const angle of [start,start+sweep]) {
       const face=[],faceIndices=[];
       for(const y of rows) {
         face.push(...point(surface,y,angle));
         // Pulp is solid to the gently curved longitudinal axis.
-        face.push(...(inner?point(inner,y,angle):[centre(y),y+.045*Math.cos(2*angle)*Math.exp(-((y/.24)**2)),0]));
+        face.push(...(inner?point(inner,y,angle):[centre(y),y+.065*(Math.cos(2*angle)+.16*Math.sin(angle))*Math.exp(-((y/.32)**2)),centreZ(y)]));
       }
       for(let i=0;i<rows.length-1;i++) {
         const a=i*2;
@@ -251,34 +307,39 @@ export function createTooth(THREE) {
   const cutRoot=tissue(cutaway,cementum,dentin,'root',true);
   const wholeCrown=tissue(intact,enamel,null,'enamel',false);
   const wholeRoot=tissue(intact,cementum,null,'root',false);
-  // The two tissues meet at CEJ with common positions and shared smooth normals.
-  function smoothCervical(crown,root) {
-    const cp=crown.geometry.attributes.position,cn=crown.geometry.attributes.normal;
-    const rp=root.geometry.attributes.position,rn=root.geometry.attributes.normal;
-    const rootIndex=new Map();
-    for(let i=0;i<rp.count;i++) {
-      if(Math.abs(rp.getY(i))>.05) continue;
-      rootIndex.set([rp.getX(i),rp.getY(i),rp.getZ(i)].map(v=>Math.round(v*1e6)).join(','),i);
-    }
-    for(let i=0;i<cp.count;i++) {
-      if(Math.abs(cp.getY(i))>.05) continue;
-      const key=[cp.getX(i),cp.getY(i),cp.getZ(i)].map(v=>Math.round(v*1e6)).join(',');
-      const j=rootIndex.get(key);
-      if(j===undefined) continue;
-      const average=new THREE.Vector3().fromBufferAttribute(cn,i).add(new THREE.Vector3().fromBufferAttribute(rn,j)).normalize();
-      cn.setXYZ(i,average.x,average.y,average.z);rn.setXYZ(j,average.x,average.y,average.z);
-    }
-    cn.needsUpdate=true;rn.needsUpdate=true;
+  // Analytic central-difference normals above sample through the same CEJ,
+  // eliminating the lighting seam without averaging two mismatched tangents.
+  const anchors={
+    enamel:new THREE.Vector3(...point(enamel,1.10,Math.PI/2)),
+    dentin:new THREE.Vector3(...point(dentin,.48,Math.PI/2)).multiply(new THREE.Vector3(.68,1,1)),
+    pulp:new THREE.Vector3(...point(pulp,.60,0)),
+    root:new THREE.Vector3(...point(cementum,-1.20,Math.PI/2))
+  };
+  const anchorCandidates={};
+  const anchorCandidatesCutaway={};
+  for(const [part,surface,y] of [['enamel',enamel,1.02],['root',cementum,-1.18]]) {
+    anchorCandidates[part]=Array.from({length:32},(_,i)=>new THREE.Vector3(...point(surface,y,i*Math.PI/16)));
+    anchorCandidatesCutaway[part]=Array.from({length:25},(_,i)=>new THREE.Vector3(...point(surface,y,Math.PI/2+i*Math.PI/16)));
   }
-  smoothCervical(cutCrown,cutRoot);smoothCervical(wholeCrown,wholeRoot);
+  // Place internal pins within the coloured cut strip, not on a tissue border.
+  for(const [part,surface,inner,y] of [['dentin',dentin,pulp,.48],['pulp',pulp,null,.60]]) {
+    anchorCandidatesCutaway[part]=[Math.PI/2,Math.PI*2].map(angle=>{
+      const outer=new THREE.Vector3(...point(surface,y,angle));
+      const inside=inner?new THREE.Vector3(...point(inner,y,angle)):
+        new THREE.Vector3(centre(y),y+.065*(Math.cos(2*angle)+.16*Math.sin(angle))*Math.exp(-((y/.32)**2)),centreZ(y));
+      return outer.lerp(inside,.5);
+    });
+    anchors[part]=anchorCandidatesCutaway[part][0].clone();
+  }
+  const labelBounds=[];
+  for(const [surface,ys] of [[enamel,[0,.18,.45,.80,1.1,1.35,1.58,1.70,1.79]],
+    [cementum,[-2.23,-2.1,-1.84,-1.6,-1.3,-.95,-.55,-.2,0]]]) {
+    for(const y of ys)for(let i=0;i<24;i++)labelBounds.push(new THREE.Vector3(...point(surface,y,i*Math.PI/12)));
+  }
   return {
     cutaway,intact,
-    anchors:{
-      enamel:new THREE.Vector3(...point(enamel,1.12,Math.PI/2)),
-      dentin:new THREE.Vector3(.355,.43,0),
-      pulp:new THREE.Vector3(0,.51,.065),
-      root:new THREE.Vector3(...point(cementum,-1.35,Math.PI/2))
-    },
+    anchors,anchorCandidates,anchorCandidatesCutaway,labelBounds,
+    proportions:{crownHeight:1.80,rootLength:2.23,guide:{crown:10.5,root:13,width:8.5,depth:7}},
     triangleCount
   };
 }

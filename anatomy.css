@@ -112,3 +112,19 @@
  .hotspot-note p { margin:4px 0 0; font-size:12px; line-height:1.6; }
  .hotspot-note button { display:grid; place-items:center; flex:0 0 44px; width:44px; height:44px; border:0; border-radius:8px; background:var(--mint); color:var(--teal); font-size:24px; cursor:pointer; }
 }
+/* View-dependent side rails keep labels off the anatomy. */
+.hotspot-initial { display:none; }
+.tooth-hotspot.is-compact { width:44px; height:44px; min-width:44px; padding:0; justify-content:center; font-size:14px; }
+.tooth-hotspot.is-compact .hotspot-name,.tooth-hotspot.is-compact .hotspot-dot { display:none; }
+.tooth-hotspot.is-compact .hotspot-initial { display:inline; }
+.hotspot-dock { display:flex; flex-wrap:wrap; gap:6px; padding-top:8px; }
+.hotspot-dock .anatomy-part { flex:1; min-height:44px; justify-content:center; padding:8px; font-size:11px; gap:5px; }
+.hotspot-connectors line { stroke-dasharray:none; stroke-opacity:.8; }
+.anatomy-help { margin:4px 0 0; padding:0; border:0; border-radius:0; background:transparent; }
+.anatomy-help summary { width:fit-content; min-height:44px; font-size:11px; font-weight:500; color:var(--teal); gap:12px; }
+.anatomy-help summary:after { font-size:18px; }
+.anatomy-help[open] { background:transparent; border:0; }
+.anatomy-help p { max-width:660px; margin:0 0 8px; font-size:11px; }
+@media(max-width:359px) {
+ .hotspot-dock .anatomy-part { padding-inline:6px; gap:4px; font-size:10px; }
+}
