@@ -129,9 +129,3 @@ function openLinkedAnswer() {
 }
 window.addEventListener('hashchange', openLinkedAnswer);
 openLinkedAnswer();
-document.querySelectorAll('.faq-navigation a').forEach((link) => {
-  link.addEventListener('click', () => {
-    const answer = document.getElementById(link.hash.slice(1));
-    if (answer) answer.open = true;
-  });
-});

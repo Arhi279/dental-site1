@@ -317,3 +317,123 @@ input[type=checkbox] { width:20px; height:20px; min-height:0; flex:0 0 20px; mar
   html { scroll-behavior:auto; }
   *,*::before,*::after { animation:none!important; transition:none!important; }
 }
+
+/* Editorial clinic preview, scoped to the requested sections. */
+.clinic-preview { border-block:1px solid var(--line); background:linear-gradient(110deg,#f5faf8,#fff); }
+.clinic-preview-grid { display:grid; grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr); gap:48px; align-items:center; }
+.clinic-preview-copy { max-width:570px; }
+.clinic-preview-copy h2 { font-size:clamp(25px,2.8vw,34px); }
+.clinic-preview-copy>p:not(.eyebrow) { margin-bottom:8px; font-size:14px; }
+.space-preview { position:relative; display:flex; align-items:center; justify-content:center; min-width:0; height:220px; overflow:hidden; border:1px solid #cfe3db; border-radius:48px 16px 16px 16px; background:linear-gradient(135deg,#e5f2ec,#f8fbfa); color:#5f9484; }
+.room-sketch { width:100%; height:100%; object-fit:contain; }
+.space-label { position:absolute; left:16px; bottom:16px; display:flex; align-items:center; gap:8px; max-width:calc(100% - 32px); padding:8px 12px; border:1px solid #fff; border-radius:10px; background:#fffffff0; color:var(--navy); font-size:11px; line-height:1.5; }
+.space-label .icon { width:16px; height:16px; color:var(--teal); }
+.space-label small { display:block; color:var(--muted); font-size:9px; }
+.section-caption { color:var(--muted); font-size:12px; }
+.booking-steps { padding-top:8px; padding-bottom:32px; }
+.booking-steps h2 { font-size:28px; }
+.booking-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:16px; list-style:none; margin:0; padding:0; }
+.booking-card { display:flex; align-items:flex-start; gap:16px; position:relative; min-width:0; padding:20px; border:1px solid var(--line); border-radius:16px; background:var(--surface); transition:background-color .2s,border-color .2s,transform .2s; }
+.booking-card:nth-child(2) { background:var(--mint); }
+.booking-card:not(:last-child):after { content:'→'; position:absolute; right:-13px; top:30px; z-index:1; color:var(--teal); background:white; width:24px; text-align:center; line-height:24px; border-radius:50%; font-size:15px; }
+.step-icon { display:inline-grid; place-items:center; width:36px; height:36px; flex:0 0 36px; color:var(--teal); border:1px solid #cfe3da; background:white; border-radius:11px; }
+.booking-card h3 { font-size:17px; margin-bottom:6px; }
+.booking-card p { font-size:12px; line-height:1.6; margin:0; }
+.booking-footer { display:flex; align-items:center; justify-content:space-between; gap:24px; margin-top:16px; }
+.booking-footer p { max-width:620px; margin:0; font-size:12px; }
+.booking-footer .button { flex-shrink:0; }
+.clinic-page .section { padding-block:32px; }
+.clinic-introduction { display:grid; grid-template-columns:1fr 1.3fr; gap:48px; border-bottom:1px solid var(--line); }
+.clinic-introduction h2 { font-size:28px; }
+.clinic-introduction p { font-size:15px; margin-bottom:12px; }
+.clinic-introduction .section-caption { font-size:12px; margin-bottom:0; }
+.clinic-gallery { display:grid; grid-template-columns:1.3fr 1fr; gap:16px; }
+.clinic-gallery figure { margin:0; min-width:0; }
+.clinic-gallery figure:first-child { grid-row:span 2; }
+.clinic-gallery .space-preview { height:150px; border-radius:16px; }
+.clinic-gallery figure:first-child .space-preview { height:calc(100% - 30px); min-height:300px; border-top-left-radius:48px; }
+.clinic-gallery figcaption { padding-top:8px; color:var(--muted); font-size:12px; }
+.clinic-gallery figure:nth-child(2) .space-preview { background:linear-gradient(140deg,#f5faf8,#e8f1ed); }
+.clinic-gallery figure:nth-child(3) .room-sketch { transform:scaleX(-1); }
+.clinic-team { display:grid; grid-template-columns:.5fr 1.5fr; gap:48px; align-items:center; border-bottom:1px solid var(--line); }
+.team-mark { display:grid; place-items:center; width:136px; height:136px; margin:auto; background:var(--mint); border:1px solid var(--line); border-radius:50% 50% 16px 50%; }
+.team-mark>.icon { width:56px; height:56px; color:#719e90; }
+.clinic-team h2 { font-size:28px; }
+.clinic-team p:not(.eyebrow) { max-width:640px; font-size:14px; margin-bottom:8px; }
+.clinic-facts { display:grid; grid-template-columns:1fr 1fr; gap:40px; }
+.clinic-fact { border-top:1px solid var(--line); padding-top:24px; }
+.clinic-fact .step-icon { float:right; margin-left:16px; }
+.clinic-fact h2 { font-size:26px; }
+.clinic-fact p:not(.template-label) { font-size:14px; margin-bottom:8px; }
+.clinic-final { padding-bottom:32px; }
+.clinic-final .page-cta { margin-top:0; }
+.clinic-final .page-cta>div { max-width:700px; }
+/* Native details/summary exposes the expanded state and supports Enter/Space without JS. */
+.faq-focused { grid-template-columns:.6fr 1.4fr; align-items:start; }
+.faq-guidance { position:sticky; top:100px; padding-top:8px; }
+.faq-focused summary { min-height:32px; }
+.faq-focused details[open] p { animation:answer-appear .22s ease-out; }
+@keyframes answer-appear { from { opacity:0; transform:translateY(-4px); } to { opacity:1; transform:translateY(0); } }
+@media(hover:hover) and (pointer:fine) {
+ .booking-card:hover { transform:translateY(-2px); border-color:#91beb0; background:#f0f8f4; }
+ .clinic-preview .text-link .icon { transition:transform .2s; }
+ .clinic-preview .text-link:hover .icon { transform:translateX(3px); }
+}
+@media(max-width:950px) {
+ .clinic-preview-grid { gap:24px; }
+ .booking-card { flex-direction:column; gap:12px; padding:16px; }
+ .clinic-introduction,.clinic-team { gap:24px; }
+}
+@media(max-width:720px) {
+ .clinic-preview-grid { grid-template-columns:minmax(0,1fr); gap:20px; }
+ .clinic-preview .space-preview { height:120px; border-radius:28px 12px 12px 12px; }
+ .clinic-preview .room-sketch { width:auto; min-width:260px; transform:translateX(48px); }
+ .clinic-preview .space-label { bottom:12px; left:12px; }
+ .clinic-preview-copy h2 { font-size:25px; margin-bottom:12px; }
+ .clinic-preview-copy .eyebrow { font-size:9px; margin-bottom:8px; }
+ .clinic-preview-copy>p:not(.eyebrow) { font-size:13px; }
+ .booking-steps { padding-top:0; padding-bottom:24px; }
+ .booking-steps h2 { font-size:25px; }
+ .booking-steps .section-caption { display:none; }
+ .booking-grid { grid-template-columns:minmax(0,1fr); gap:10px; }
+ .booking-card { flex-direction:row; align-items:center; gap:12px; padding:12px 16px; }
+ .booking-card h3 { font-size:15px; margin-bottom:2px; }
+ .booking-card p { font-size:12px; }
+ .booking-card:not(:last-child):after { content:'↓'; left:22px; right:auto; top:auto; bottom:-15px; font-size:13px; width:24px; line-height:20px; }
+ .booking-footer { gap:12px; flex-wrap:wrap; }
+ .booking-footer p { flex:1 1 180px; font-size:11px; }
+ .booking-footer .button { padding-inline:16px; gap:16px; }
+ .clinic-page .section { padding-block:24px; }
+ .clinic-introduction,.clinic-team,.clinic-facts { grid-template-columns:minmax(0,1fr); gap:16px; }
+ .clinic-introduction h2 { font-size:25px; margin-bottom:0; }
+ .clinic-introduction p { font-size:14px; }
+ .clinic-space .section-heading { display:block; }
+ .clinic-space .section-heading h2 { margin-bottom:12px; }
+ .clinic-space .section-heading p { font-size:12px; }
+ .clinic-gallery { gap:12px; grid-template-columns:repeat(2,minmax(0,1fr)); }
+ .clinic-gallery figure:first-child { grid-column:1/-1; grid-row:auto; }
+ .clinic-gallery figure:first-child .space-preview { height:180px; min-height:0; }
+ .clinic-gallery .space-preview { height:132px; }
+ .clinic-gallery .space-label { left:8px; bottom:8px; max-width:calc(100% - 16px); padding:6px 8px; font-size:10px; gap:6px; }
+ .clinic-gallery .space-label>.icon { display:none; }
+ .clinic-gallery .space-label small { font-size:8px; }
+ .clinic-gallery .room-sketch { width:250px; flex-shrink:0; }
+ .clinic-team { grid-template-columns:48px minmax(0,1fr); gap:16px; align-items:start; }
+ .team-mark { width:48px; height:56px; border-radius:16px 16px 8px 8px; }
+ .team-mark>.icon { width:28px; height:28px; }
+ .clinic-team h2 { font-size:25px; }
+ .clinic-team .eyebrow { margin-bottom:8px; }
+ .clinic-team p:not(.eyebrow),.clinic-fact p:not(.template-label) { font-size:13px; }
+ .clinic-fact { padding-top:20px; }
+ .clinic-fact h2 { font-size:24px; }
+ .clinic-fact .template-label { font-size:11px; }
+ .clinic-final { padding-bottom:24px; }
+ .faq-focused { grid-template-columns:minmax(0,1fr); gap:16px; }
+ .faq-guidance { position:static; padding:0; }
+ .faq-guidance .eyebrow { display:none; }
+ .faq-guidance p { margin-bottom:0; }
+ .faq-guidance .text-link { font-size:12px; }
+}
+@media(prefers-reduced-motion:reduce) {
+ .faq-focused details[open] p { animation:none; }
+}
