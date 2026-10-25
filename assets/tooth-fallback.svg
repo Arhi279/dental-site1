@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="640" viewBox="0 0 600 640" fill="none">
+ <rect width="600" height="640" rx="24" fill="#edf7f4"/>
+ <ellipse cx="300" cy="564" rx="113" ry="14" fill="#d5e8e0"/>
+ <path d="M209 271c-13-44-34-116-14-156 20-30 185-30 207 0 17 38-7 116-21 156-13 58-23 127-41 186-18 63-36 87-43 82-10-6-14-53-22-91-12-62-30-125-66-177Z" fill="#fffdf4" stroke="#9dbdb1" stroke-width="3"/>
+ <path d="M225 269c-12-39-27-103-14-132 17-22 154-22 170 0 12 30-7 93-19 132-12 54-23 129-39 180-11 40-18 65-24 71-3-19-10-53-14-77-12-68-33-126-60-174Z" fill="#e6bf73"/>
+ <path d="M253 242c-5-29-7-57 0-68 13-14 72-14 88 0 6 15 3 49-5 72-9 39-18 91-24 147-4 40-8 82-14 123-7-60-9-109-17-157-5-46-15-88-28-117Z" fill="#c96564"/>
+ <path d="M301 188c-10 61-1 139-2 201l-1 115" stroke="#9a424b" stroke-width="4"/>
+ <g font-family="system-ui,sans-serif" font-size="16" fill="#163e46" stroke="#749d8e" stroke-width="1.3">
+  <path d="M393 128h47"/><path d="M359 237h81"/><path d="M305 316h135"/><path d="M337 450h103"/>
+  <text x="449" y="134" stroke="none">Емаль</text><text x="449" y="243" stroke="none">Дентин</text><text x="449" y="322" stroke="none">Пульпа</text><text x="449" y="456" stroke="none">Корінь</text>
+ </g>
+ <text x="32" y="40" font-family="system-ui,sans-serif" font-size="13" fill="#526b70">Резервна освітня схема · не 3D-перегляд</text>
+</svg>
