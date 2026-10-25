@@ -23,7 +23,7 @@
 ## Як порівняти
 
 - Попередня опублікована версія: https://a95cde38.dental-studio-demo.pages.dev/tooth-anatomy.html
-- Нова preview-гілка після успішного Cloudflare build: https://feature-tooth-geometry-polish.dental-studio-demo.pages.dev/tooth-anatomy.html
+- Нова preview-гілка після успішного Cloudflare build: https://feature-tooth-geometry-polis.dental-studio-demo.pages.dev/tooth-anatomy.html
 
 Порівняйте цілий зуб і розріз спереду, ззаду, збоку та зверху. На 390 px перевірте позначку «Емаль» у цілому зубі, обертання, збільшення та поворот екрана. При сильному наближенні може з’явитися ряд позначок під вікном — це зберігає видимість моделі.
 
