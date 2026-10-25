@@ -180,3 +180,66 @@ summary:hover{color:var(--teal)}
  *,*::before,*::after{animation:none!important;transition:none!important}
  html{scroll-behavior:auto}
 }
+
+/* Редакційна типографіка та спокійні клінічні відтінки. */
+:root{--navy:#173e49;--teal:#08766d;--mint:#edf5f2;--muted:#506970;--line:#dce6e2;--bento-shadow:0 16px 40px -24px #173e4926,0 2px 8px #173e4905}
+body{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;line-height:1.7;-webkit-font-smoothing:antialiased}
+h1,h2,h3{text-wrap:balance;font-weight:600}
+h1{font-size:clamp(44px,4.6vw,64px);line-height:1.12;letter-spacing:-2.6px;margin-bottom:24px}
+h2{font-size:clamp(32px,3.4vw,44px);line-height:1.2;letter-spacing:-1.5px}
+h3{font-size:21px;line-height:1.35;letter-spacing:-.4px}
+.brand{font-weight:650;letter-spacing:-.7px}
+.eyebrow{font-weight:600;letter-spacing:1.6px;line-height:1.5}
+.hero{gap:64px;padding-block:64px 72px}
+.lead{font-size:17px;line-height:1.75;max-width:440px;margin-bottom:32px}
+.hero-art{border-radius:160px 160px 24px 24px;background:#e4f0eb;box-shadow:none;border:1px solid #d6e7df}
+.art-orbit{border-color:#c7dfd5}
+.art-caption{border-radius:12px;background:#fffffff0;box-shadow:0 8px 24px #173e4908}
+.bento-badge{border-color:#08766d1f;background:#f7faf8;box-shadow:none;border-radius:8px;font-weight:500}
+.hero-note.bento-badge{font-size:11px;line-height:1.5;padding:8px 12px;letter-spacing:.1px}
+.services-grid .service.bento-card{background:#f8fbf9;box-shadow:none;border-color:#dce7e1!important;border-radius:16px;padding:32px!important;display:flex;flex-direction:column}
+.service-number{margin-bottom:32px;font-variant-numeric:tabular-nums}
+.service h3{margin-bottom:16px}
+.service p{font-size:14px;line-height:1.8;margin-bottom:24px}
+.service-action{display:block;margin-top:auto;padding-top:16px;border-top:1px solid var(--line);color:var(--teal);font-size:12px;font-weight:600;letter-spacing:.1px}
+.button{font-weight:600;border-radius:8px;box-shadow:0 3px 8px #08766d12;letter-spacing:.1px}
+.button:focus-visible,.service:focus-visible{outline:3px solid #08766d;outline-offset:4px}
+.button:active{background:#065c55}
+.about{background:#f2f7f4}
+.about-intro{font-size:23px;line-height:1.6;font-weight:450}
+.about-values span{border:1px solid #dce7e1;background:transparent;padding:8px 16px}
+.appointment-panel{background:#edf5f1;border:1px solid #d9e8e0;box-shadow:none;border-radius:20px}
+#appointment-form input:not([type=checkbox]){background:#fff;border-color:#b9cfc5}
+#appointment-form .consent-label{font-size:12px;line-height:1.7}
+.form-disclaimer{line-height:1.8}
+summary{font-weight:550}
+.contact-data dt{font-weight:500}
+@media(hover:hover) and (pointer:fine){
+ .services-grid .bento-card:hover{background:#f1f7f3;transform:translateY(-4px);box-shadow:0 16px 32px -24px #173e4940}
+ .button:hover{background:#065f58;box-shadow:0 6px 16px #08766d20;transform:translateY(-1px)}
+}
+@media(min-width:721px) and (max-width:1100px){
+ .hero{gap:32px}
+ h1{font-size:44px}
+ .services-grid .service.bento-card{padding:24px!important}
+}
+@media(max-width:720px){
+ h1{font-size:clamp(31px,8.7vw,38px);line-height:1.16;letter-spacing:-1.25px;margin-bottom:16px}
+ h2{font-size:clamp(28px,7.6vw,34px);line-height:1.24;letter-spacing:-.9px}
+ h3{font-size:20px}
+ .hero{padding-block:32px;gap:24px}
+ .lead{font-size:15px;line-height:1.75;margin-bottom:24px}
+ .hero-art{height:216px;border-radius:96px 96px 16px 16px}
+ .hero-note.bento-badge{font-size:10px}
+ .section{padding-block:40px}
+ .section-heading>p{line-height:1.75}
+ .services-grid .service.bento-card{padding:24px!important;border-radius:16px}
+ .service-number{margin-bottom:24px}
+ .service p{margin-bottom:24px;font-size:14px}
+ .service-action{font-size:12px}
+ .about-grid .about-intro{font-size:20px;line-height:1.6}
+ .appointment-panel{padding:24px;border-radius:16px}
+ .appointment-panel .form-disclaimer{font-size:12px;line-height:1.75}
+ .header .brand{font-size:18px}
+ .header .header-inner{gap:8px}
+}
