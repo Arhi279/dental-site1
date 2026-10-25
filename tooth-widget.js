@@ -85,7 +85,7 @@
       renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
       renderer.outputColorSpace = THREE.SRGBColorSpace;
       renderer.toneMapping = THREE.ACESFilmicToneMapping;
-      renderer.toneMappingExposure = 1.1;
+      renderer.toneMappingExposure = 1.0;
       const canvas = renderer.domElement;
       canvas.id = 'tooth-canvas';
       canvas.tabIndex = 0;
@@ -96,7 +96,7 @@
       cleanupPartial = () => { renderer.dispose(); canvas.remove(); };
       const scene = new THREE.Scene();
       const camera = new THREE.PerspectiveCamera(35, 1, 0.1, 50);
-      const initialPosition = new THREE.Vector3(4.8, 2, 7);
+      const initialPosition = new THREE.Vector3(4.2, 1.35, 6.5);
       const initialTarget = new THREE.Vector3(0, -0.25, 0);
       camera.position.copy(initialPosition);
       const controls = new THREE.OrbitControls(camera, canvas);
@@ -111,13 +111,47 @@
       controls.minPolarAngle = 0.12;
       controls.maxPolarAngle = Math.PI - 0.12;
       controls.update();
-      scene.add(new THREE.HemisphereLight(0xffffff, 0x78958b, 2.4));
-      const keyLight = new THREE.DirectionalLight(0xffffff, 3);
-      keyLight.position.set(3, 5, 6);
+      // Broad studio cards baked once into a small PMREM. No HDR download,
+      // transparent materials, real-time shadows or per-frame lighting updates.
+      const studio = new THREE.Scene();
+      studio.background = new THREE.Color('#687570');
+      const cardGeometry = new THREE.PlaneGeometry(1, 1);
+      const cardMaterials = [];
+      function softbox(position, width, height, radiance) {
+        const color = new THREE.Color().setRGB(...radiance);
+        const material = new THREE.MeshBasicMaterial({ color, side: THREE.DoubleSide });
+        cardMaterials.push(material);
+        const card = new THREE.Mesh(cardGeometry, material);
+        card.position.set(...position);
+        card.scale.set(width, height, 1);
+        card.lookAt(0, 0, 0);
+        studio.add(card);
+      }
+      softbox([-3.8, 3.5, 4.5], 3.5, 5.5, [6.0, 5.8, 5.5]);
+      softbox([4.5, 1.4, 2.5], 2.5, 4.0, [2.2, 2.4, 2.5]);
+      softbox([-1.0, 3.0, -4.0], 3.0, 4.0, [4.0, 4.1, 4.0]);
+      const pmrem = new THREE.PMREMGenerator(renderer);
+      let studioMap;
+      try {
+        studioMap = pmrem.fromScene(studio, .06, .1, 30, { size: 128 });
+        scene.environment = studioMap.texture;
+        scene.environmentIntensity = .8;
+      } finally {
+        pmrem.dispose();
+        cardGeometry.dispose();
+        cardMaterials.forEach(material => material.dispose());
+      }
+      cleanupPartial = () => { studioMap?.dispose(); renderer.dispose(); canvas.remove(); };
+      scene.add(new THREE.HemisphereLight(0xffffff, 0x9baca4, .42));
+      const keyLight = new THREE.DirectionalLight(0xfff9ed, 1.25);
+      keyLight.position.set(-3.5, 5, 5);
       scene.add(keyLight);
-      const fillLight = new THREE.DirectionalLight(0xe3fff4, 1.4);
-      fillLight.position.set(-4, 1, -3);
+      const fillLight = new THREE.DirectionalLight(0xeaf4ff, .35);
+      fillLight.position.set(4, 1, 3);
       scene.add(fillLight);
+      const rimLight = new THREE.DirectionalLight(0xf3fff9, .65);
+      rimLight.position.set(-2, 3, -4);
+      scene.add(rimLight);
       const model = createTooth(THREE);
       scene.add(model.cutaway, model.intact);
       model.intact.visible = false;
@@ -270,7 +304,7 @@
       function setCutaway() {
         model.cutaway.visible = toggle.checked;
         model.intact.visible = !toggle.checked;
-        badge.textContent = toggle.checked ? 'Умовний розріз' : 'Зовнішній вигляд';
+        badge.textContent = toggle.checked ? 'Анатомічний розріз' : 'Зовнішній вигляд';
         invalidate();
       }
       toggle.addEventListener('change', setCutaway);
@@ -286,13 +320,8 @@
       });
       viewer = {
         setCutaway,
-        highlight(part) {
-          model.cutaway.traverse(object => {
-            if (object.isMesh) {
-              object.material.emissive.set(object.userData.part === part ? '#24362c' : '#000000');
-              object.material.emissiveIntensity = .12;
-            }
-          });
+        highlight() {
+          // Selection lives in the labels and explanation; tissue colours stay neutral.
           invalidate();
         },
         dispose() {
@@ -309,6 +338,7 @@
             if (object.isMesh) { object.geometry.dispose(); materials.add(object.material); }
           });
           materials.forEach(material => material.dispose());
+          studioMap?.dispose();
           renderer.dispose();
           canvas.remove();
         }
