@@ -18,7 +18,8 @@ navigation.addEventListener('click', (event) => {
   const link = event.target.closest('a');
   if (link) {
     closeMenu();
-    const target = document.querySelector(link.getAttribute('href'));
+    const href = link.getAttribute('href');
+    const target = href.startsWith('#') ? document.querySelector(href) : null;
     if (target) {
       target.setAttribute('tabindex', '-1');
       target.focus({ preventScroll: true });
@@ -37,6 +38,7 @@ document.addEventListener('click', (event) => {
 window.matchMedia('(max-width: 950px)').addEventListener('change', closeMenu);
 
 // Заявка надсилається лише після перевірки полів та згоди.
+if (document.querySelector("#appointment-form")) {
 const form = document.querySelector('#appointment-form');
 const nameInput = document.querySelector('#name');
 const phoneInput = document.querySelector('#phone');
@@ -104,30 +106,4 @@ form.addEventListener('submit', async (event) => {
     if (!submitting) message.textContent = '';
   });
 });
-
-// Нативний dialog утримує фокус у вікні та підтримує Escape.
-document.querySelectorAll('[data-service]').forEach((button) => {
-  const dialog = document.getElementById(button.dataset.service);
-  button.addEventListener('click', () => dialog.showModal());
-  dialog.querySelector('.dialog-close').addEventListener('click', () => dialog.close());
-  dialog.addEventListener('click', (event) => {
-    if (event.target !== dialog) return;
-    const bounds = dialog.getBoundingClientRect();
-    if (event.clientX < bounds.left || event.clientX > bounds.right ||
-        event.clientY < bounds.top || event.clientY > bounds.bottom) dialog.close();
-  });
-  let goToForm = false;
-  dialog.querySelector('.dialog-appointment').addEventListener('click', () => {
-    goToForm = true;
-    dialog.close();
-  });
-  dialog.addEventListener('close', () => {
-    if (goToForm) {
-      goToForm = false;
-      document.querySelector('#name').focus({ preventScroll: true });
-      document.querySelector('#appointment').scrollIntoView({ block: 'start' });
-    } else {
-      button.focus({ preventScroll: true });
-    }
-  });
-});
+}
