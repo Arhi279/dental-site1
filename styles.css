@@ -122,3 +122,61 @@ section[id]{scroll-margin-top:12px}
   .header:has(.menu-toggle[hidden]) .header-inner{height:auto;min-height:71px;flex-wrap:wrap;padding-block:12px}
   .header:has(.menu-toggle[hidden]) nav{position:static;max-height:none;box-shadow:none;border:0;width:100%;padding-inline:0}
 }
+
+/* Bento: восьмипіксельний ритм, локальні SVG та стриманий рух. */
+:root{--space:8px;--bento-shadow:0 24px 48px -24px #153b492e,0 8px 24px -12px #087c7324,0 1px 2px #153b490a}
+.bento-badge{display:inline-flex;align-items:center;width:fit-content;max-width:100%;padding:8px 16px;border:1px solid #087c7326;border-radius:12px;background:#ffffffb8;color:var(--teal);font-size:11px;line-height:1.5;box-shadow:0 4px 12px #153b4908;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.hero-note.bento-badge{display:flex;margin-top:16px}
+.hero-art{box-shadow:var(--bento-shadow);border:1px solid #ffffffb3}
+.art-caption{backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);box-shadow:0 8px 24px #153b4912;border:1px solid #ffffff99}
+.fa-icon{width:18px;height:18px}
+.services-grid.bento-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));align-items:start;gap:16px;border:0;padding-bottom:40px}
+.services-grid .service.bento-card{display:block;min-width:0;height:100%;padding:32px 24px!important;border:1px solid #153b4914!important;border-radius:24px;background:linear-gradient(145deg,#fff,#f0f7f4);box-shadow:0 8px 24px -16px #153b4929;transition:transform .25s ease,box-shadow .25s ease,border-color .25s ease,background-color .25s ease;position:relative}
+.services-grid .service:nth-child(even){top:40px}
+.service-number{margin-bottom:32px}
+.service h3{margin-bottom:16px}
+.service p{line-height:1.7}
+.service .icon{transition:transform .25s ease}
+.service:active{transform:scale(.98);border-color:var(--teal)!important}
+.button,.menu-toggle,.header nav a,.footer a,summary{transition:background-color .2s ease,color .2s ease,border-color .2s ease,box-shadow .2s ease,transform .2s ease}
+.button{padding:16px 24px;min-height:48px}
+.button .icon{transition:transform .2s ease}
+.button:active,.menu-toggle:active{transform:scale(.98)}
+.menu-toggle:hover{background:var(--mint);border-color:#087c7350}
+summary:hover{color:var(--teal)}
+.appointment-panel{box-shadow:var(--bento-shadow);border:1px solid #ffffff99;border-radius:24px}
+#appointment-form input:not([type=checkbox]){padding:16px;border-radius:12px}
+#appointment-form .consent-label{gap:8px;padding-block:8px}
+#appointment-form .field-error{margin:8px 0 16px}
+.hero-copy,.hero-art,.section-heading,.bento-card,.about-grid,.faq-grid,.appointment-panel,.contacts{animation:bento-fade-in .5s ease both}
+.hero-art{animation-delay:.08s}
+.bento-card:nth-child(2){animation-delay:.08s}.bento-card:nth-child(3){animation-delay:.16s}.bento-card:nth-child(4){animation-delay:.24s}
+@keyframes bento-fade-in{from{opacity:0}to{opacity:1}}
+@media(hover:hover) and (pointer:fine){
+ .services-grid .bento-card:hover{transform:translateY(-4px) scale(1.025);box-shadow:var(--bento-shadow);border-color:#087c734d!important}
+ .service:hover .icon,.button:hover .icon{transform:translateX(4px)}
+}
+@media(max-width:950px){
+ .services-grid.bento-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+ .services-grid .service.bento-card{padding:24px!important;border-radius:16px}
+ .appointment-panel{padding:32px;gap:32px}
+}
+@media(max-width:720px){
+ .services-grid.bento-grid{grid-template-columns:1fr;gap:16px;padding-bottom:0}
+ .services-grid .service:nth-child(even){top:0}
+ .services-grid .service.bento-card{padding:24px!important;height:auto}
+ .service-number{margin-bottom:16px}
+ .hero{padding-block:32px;gap:24px}
+ .hero-note.bento-badge{font-size:10px;padding:8px 12px}
+ .hero-art{box-shadow:0 16px 32px -24px #153b4940}
+ .section-heading{margin-bottom:24px}
+ .about-grid,.faq-grid,.contacts{gap:24px}
+ .appointment-panel{padding:24px;gap:24px;border-radius:24px}
+ .appointment-panel .bento-badge{padding:8px 12px;font-size:10px}
+ .section{padding-block:40px}
+ .contact-data dl>div{gap:8px;padding-block:16px}
+}
+@media(prefers-reduced-motion:reduce){
+ *,*::before,*::after{animation:none!important;transition:none!important}
+ html{scroll-behavior:auto}
+}
