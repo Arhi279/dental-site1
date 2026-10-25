@@ -107,3 +107,31 @@ form.addEventListener('submit', async (event) => {
   });
 });
 }
+
+// Indicate the current section, including procedure and profile pages.
+const currentPage = location.pathname.split('/').pop() || 'index.html';
+const parentPages = {
+  'caries.html': 'services.html', 'hygiene.html': 'services.html',
+  'whitening.html': 'services.html', 'orthodontics.html': 'services.html',
+  'doctor-profile.html': 'doctors.html'
+};
+navigation.querySelectorAll('a').forEach((link) => {
+  const page = link.getAttribute('href');
+  if (page === currentPage) link.setAttribute('aria-current', 'page');
+  else if (page === parentPages[currentPage]) link.setAttribute('aria-current', 'location');
+});
+
+// A direct FAQ link opens its answer as well as scrolling to it.
+function openLinkedAnswer() {
+  const id = location.hash.slice(1);
+  const target = id ? document.getElementById(id) : null;
+  if (target && target.matches('.faq-list details')) target.open = true;
+}
+window.addEventListener('hashchange', openLinkedAnswer);
+openLinkedAnswer();
+document.querySelectorAll('.faq-navigation a').forEach((link) => {
+  link.addEventListener('click', () => {
+    const answer = document.getElementById(link.hash.slice(1));
+    if (answer) answer.open = true;
+  });
+});
