@@ -28,6 +28,7 @@
     if (event.key === 'Escape') { hotspotNote.hidden = true; document.getElementById('tooth-canvas')?.focus(); }
   });
   let selectedPart = 'enamel';
+  let cutaway = true;
   let viewer = null;
   // Explanations remain usable even if WebGL or the local module is unavailable.
   function selectPart(part) {
@@ -40,7 +41,7 @@
     });
     if (viewer) {
       if (part === 'dentin' || part === 'pulp') {
-        toggle.checked = true;
+        cutaway = true;
         viewer.setCutaway();
       }
       viewer.highlight(part);
@@ -72,6 +73,7 @@
     hotspotNote.hidden = true;
     badge.hidden = true;
     toggle.disabled = true;
+    toggle.hidden = true;
     actionButtons.forEach(button => { button.disabled = true; });
     if (viewer) viewer.dispose();
     else cleanupPartial();
@@ -157,6 +159,7 @@
       const model = createTooth(THREE);
       scene.add(model.cutaway, model.intact);
       model.intact.visible = false;
+      let viewport = { left: 0, top: 0, width: 1, height: 1 };
       let frameId = 0;
       let visible = true;
       let disposed = false;
@@ -199,16 +202,16 @@
       }
       function visibleAnchor(part, geometry, width, height) {
         const internal = part === 'dentin' || part === 'pulp';
-        if (internal && !toggle.checked) return null;
-        const candidates = (toggle.checked ? model.anchorCandidatesCutaway?.[part] : null) || model.anchorCandidates?.[part] || [model.anchors[part]];
+        if (internal && !cutaway) return null;
+        const candidates = (cutaway ? model.anchorCandidatesCutaway?.[part] : null) || model.anchorCandidates?.[part] || [model.anchors[part]];
         const sorted = [...candidates].sort((a, b) => a.distanceToSquared(camera.position) - b.distanceToSquared(camera.position));
         // The closest surface candidates are the likely front-facing ones.
         // A ray must end on actual visible tissue: no labels on a removed quadrant.
         for (const anchor of sorted.slice(0, 6)) {
           projected.copy(anchor).project(camera);
-          const x = (projected.x * .5 + .5) * width;
-          const y = (-projected.y * .5 + .5) * height;
-          if (projected.z <= -1 || projected.z >= 1 || x < 0 || x > width || y < 0 || y > height) continue;
+          const x = viewport.left + (projected.x * .5 + .5) * viewport.width;
+          const y = viewport.top + (-projected.y * .5 + .5) * viewport.height;
+          if (projected.z <= -1 || projected.z >= 1 || x < viewport.left || x > viewport.left + viewport.width || y < viewport.top || y > viewport.top + viewport.height) continue;
           direction.copy(anchor).sub(camera.position);
           const distance = direction.length();
           raycaster.set(camera.position, direction.normalize());
@@ -222,17 +225,19 @@
         const width = stage.clientWidth, height = stage.clientHeight;
         if (!labelMetrics) measureLabels();
         connectors.setAttribute('viewBox', `0 0 ${width} ${height}`);
-        const geometry = toggle.checked ? model.cutaway : model.intact;
+        const geometry = cutaway ? model.cutaway : model.intact;
         const bounds = { left: Infinity, right: -Infinity, top: Infinity, bottom: -Infinity };
         for (const point of outline) {
           projected.copy(point).project(camera);
-          const x = (projected.x * .5 + .5) * width;
-          const y = (-projected.y * .5 + .5) * height;
+          const x = viewport.left + (projected.x * .5 + .5) * viewport.width;
+          const y = viewport.top + (-projected.y * .5 + .5) * viewport.height;
           bounds.left = Math.min(bounds.left, x); bounds.right = Math.max(bounds.right, x);
           bounds.top = Math.min(bounds.top, y); bounds.bottom = Math.max(bounds.bottom, y);
         }
         // The clearance protects fine model details even at a grazing angle.
-        const margin = 8, clearance = 10, gap = 8, top = 52, bottom = height - margin;
+        const margin = 8, clearance = 10, gap = 8;
+        const top = Math.max(margin, toggle.offsetTop + toggle.offsetHeight + gap);
+        const bottom = height - margin;
         const available = {
           left: bounds.left - clearance - margin,
           right: width - margin - bounds.right - clearance
@@ -316,9 +321,12 @@
         labelMetrics = null;
         const width = stage.clientWidth, height = stage.clientHeight;
         if (!width || !height) return;
-        camera.aspect = width / height;
+        // A slim control area stays outside the canvas viewport, so the button
+        // cannot obscure anatomy at any orbit angle or zoom level.
+        viewport = { left: canvas.offsetLeft, top: canvas.offsetTop, width: canvas.clientWidth, height: canvas.clientHeight };
+        camera.aspect = viewport.width / viewport.height;
         camera.updateProjectionMatrix();
-        renderer.setSize(width, height, false);
+        renderer.setSize(viewport.width, viewport.height, false);
         invalidate();
       }
       const resizeObserver = new ResizeObserver(resize);
@@ -384,12 +392,19 @@
         if (keys[event.key]) { event.preventDefault(); keys[event.key](); }
       });
       function setCutaway() {
-        model.cutaway.visible = toggle.checked;
-        model.intact.visible = !toggle.checked;
-        badge.textContent = toggle.checked ? 'Анатомічний розріз' : 'Зовнішній вигляд';
+        model.cutaway.visible = cutaway;
+        model.intact.visible = !cutaway;
+        toggle.setAttribute('aria-pressed', String(cutaway));
+        toggle.title = cutaway ? 'Показати цілий зуб' : 'Показати анатомічний розріз';
+        badge.textContent = cutaway ? 'Анатомічний розріз' : 'Цілий зуб';
+        hotspotNote.hidden = true;
         invalidate();
       }
-      toggle.addEventListener('change', setCutaway);
+      toggle.addEventListener('click', () => {
+        if (toggle.disabled || !viewer) return;
+        cutaway = !cutaway;
+        setCutaway();
+      });
       function onMotionChange() {
         controls.enableDamping = !reducedMotion.matches;
         if (reducedMotion.matches && resetAnimation) { resetAnimation = null; reset(); }
@@ -437,6 +452,8 @@
       hotspotLayer.hidden = false;
       badge.hidden = false;
       actionButtons.forEach(button => { button.disabled = false; });
+      setCutaway();
+      toggle.hidden = false;
       toggle.disabled = false;
       viewer.highlight(selectedPart);
       invalidate();
