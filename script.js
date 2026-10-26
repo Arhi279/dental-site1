@@ -55,12 +55,12 @@ form.addEventListener('submit', async (event) => {
   if (submitting) return;
   message.textContent = '';
   const name = nameInput.value.trim();
-  const nameError = name.length >= 2 && /\p{L}/u.test(name) ? '' : 'Введіть ім’я: щонайменше 2 символи, з літерами.';
+  const nameError = name.length >= 2 && /\p{L}/u.test(name) ? '' : 'Введіть ім’я: щонайменше 2 символи та хоча б одна літера.';
   const phone = phoneInput.value.trim();
   const digitCount = phone.replace(/\D/g, '').length;
   const phoneError = !phone ? 'Введіть номер телефону.' :
     (!/^\+?[\d\s()\-]+$/.test(phone) || digitCount < 10 || digitCount > 15)
-      ? 'Введіть від 10 до 15 цифр. Дозволено + на початку, пробіли, дужки та дефіси.' : '';
+      ? 'Введіть номер із 10–15 цифр. Можна додати + на початку, пробіли, дужки та дефіси.' : '';
   const consentError = consentInput.checked ? '' : 'Потрібна згода на обробку та передавання даних.';
   const fields = [[nameInput, nameError], [phoneInput, phoneError], [consentInput, consentError]];
   fields.forEach(([input, error]) => setError(input, error));
@@ -73,7 +73,7 @@ form.addEventListener('submit', async (event) => {
   submitting = true;
   submitButton.disabled = true;
   form.setAttribute('aria-busy', 'true');
-  message.textContent = 'Надсилаємо заявку…';
+  message.textContent = 'Надсилаємо тестову заявку…';
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 20000);
   const data = new FormData(form);
@@ -87,12 +87,12 @@ form.addEventListener('submit', async (event) => {
       signal: controller.signal
     });
     if (!response.ok) throw new Error('Submission rejected');
-    message.textContent = 'Дякуємо! Вашу заявку надіслано';
+    message.textContent = 'Тестову заявку надіслано. Запис на прийом не створено.';
     form.reset();
   } catch (error) {
     message.textContent = error.name === 'AbortError'
-      ? 'Час очікування вичерпано. Не вдалося підтвердити надсилання. Перевірте з’єднання та спробуйте пізніше.'
-      : 'Не вдалося надіслати заявку. Перевірте з’єднання та спробуйте ще раз пізніше.';
+      ? 'Час очікування минув. Надсилання не підтверджено. Перевірте з’єднання та спробуйте пізніше.'
+      : 'Не вдалося надіслати заявку. Перевірте з’єднання та спробуйте пізніше.';
   } finally {
     clearTimeout(timeout);
     submitting = false;
