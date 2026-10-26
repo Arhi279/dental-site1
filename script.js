@@ -40,6 +40,18 @@ window.matchMedia('(max-width: 950px)').addEventListener('change', closeMenu);
 // Заявка надсилається лише після перевірки полів та згоди.
 if (document.querySelector("#appointment-form")) {
 const form = document.querySelector('#appointment-form');
+// Keep native required-field/consent checks when JavaScript is unavailable.
+form.noValidate = true;
+const dataInfo = form.querySelector('#data-processing');
+form.querySelectorAll('[data-open-data-info]').forEach(link => {
+  link.addEventListener('click', event => {
+    if (!dataInfo) return;
+    event.preventDefault();
+    dataInfo.open = true;
+    dataInfo.querySelector('summary').focus({ preventScroll: true });
+    dataInfo.scrollIntoView({ block: 'start', behavior: 'instant' });
+  });
+});
 const nameInput = document.querySelector('#name');
 const phoneInput = document.querySelector('#phone');
 const consentInput = document.querySelector('#consent');

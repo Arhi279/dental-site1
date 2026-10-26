@@ -572,3 +572,29 @@ input[type=checkbox] { width:20px; height:20px; min-height:0; flex:0 0 20px; mar
 .clinic-fact-photo { display:block; width:100%; height:180px; object-fit:cover; border-radius:14px; margin-bottom:20px; }
 .hero-photography>img,.clinic-photo img[src*="clinic-room"],img[src*="dental-care"] { object-position:center top; }
 @media(max-width:720px) { .clinic-fact-photo { height:160px; margin-bottom:16px; } }
+
+/* Compact booking form; other page layouts retain their existing styles. */
+.appointment-panel-clean { grid-template-columns:minmax(0,1fr); gap:24px; max-width:680px; margin-inline:auto; padding:32px; }
+.appointment-panel-clean .booking-intro h2 { font-size:30px; line-height:1.2; margin-bottom:12px; }
+.appointment-panel-clean .booking-intro p { margin:0; font-size:14px; }
+.booking-field+.booking-field { margin-top:16px; }
+.booking-field label { display:block; }
+.appointment-panel-clean .field-error { min-height:0; margin:0; }
+.appointment-panel-clean .field-error:not(:empty) { margin-top:6px; }
+.booking-consent { margin-block:12px; }
+.booking-consent-label { display:flex; align-items:center; gap:10px; min-height:44px; margin:0; font-size:12px; font-weight:400; line-height:1.6; color:var(--muted); cursor:pointer; }
+.booking-consent-label input[type=checkbox] { width:16px; height:16px; flex:0 0 16px; margin:0; }
+.booking-consent-label a,.booking-data-info a { color:var(--teal); text-decoration:underline; text-underline-offset:3px; }
+.appointment-panel-clean button[type=submit] { width:100%; min-height:48px; justify-content:center; }
+.appointment-panel-clean .booking-demo-note { margin:12px 0 0; font-size:11px; line-height:1.6; color:var(--muted); }
+.booking-data-info,.booking-data-info[open] { margin:0; padding:0; border:0; border-radius:0; background:transparent; scroll-margin-top:100px; }
+.booking-data-info summary { justify-content:flex-start; gap:10px; width:fit-content; min-height:44px; padding:4px 0; font-size:12px; font-weight:500; color:var(--teal); }
+.booking-data-info summary:after { font-size:18px; }
+.booking-data-info p { margin:0 0 12px; font-size:12px; line-height:1.75; }
+.booking-data-info p:last-child { margin-bottom:0; }
+@media(max-width:720px) {
+ .appointment-panel-clean { gap:20px; padding:24px; }
+ .appointment-panel-clean .booking-intro h2 { font-size:27px; }
+ .booking-consent-label { font-size:11px; }
+}
+@media(max-width:359px) { .appointment-panel-clean { padding:20px; } }
