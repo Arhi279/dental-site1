@@ -598,3 +598,28 @@ input[type=checkbox] { width:20px; height:20px; min-height:0; flex:0 0 20px; mar
  .booking-consent-label { font-size:11px; }
 }
 @media(max-width:359px) { .appointment-panel-clean { padding:20px; } }
+
+/* Contact examples are text, with no call or email actions. */
+.contact-options { max-width:680px; padding-block:32px 8px; }
+.contact-options h2 { font-size:28px; margin-bottom:16px; }
+.contact-options-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; margin:0; }
+.contact-option-card { min-width:0; padding:20px; border:1px solid var(--line); border-radius:16px; background:white; box-shadow:0 4px 16px #163e4606; }
+.contact-option-card dt { display:flex; align-items:center; gap:10px; margin-bottom:12px; font-size:12px; font-weight:500; line-height:1.5; color:var(--muted); }
+.contact-option-icon { display:grid; place-items:center; width:32px; height:32px; flex:0 0 32px; border-radius:10px; background:var(--mint); color:var(--teal); }
+.contact-option-icon .icon { width:18px; height:18px; }
+.contact-option-card dd { margin:0; color:var(--navy); font-size:18px; font-weight:600; line-height:1.5; letter-spacing:-.02em; white-space:nowrap; }
+.contact-options-note { margin:12px 0 0; color:var(--muted); font-size:11px; line-height:1.6; }
+@media(max-width:720px) {
+ .contact-options { padding-top:24px; }
+ .contact-options h2 { font-size:25px; }
+ .contact-options-grid { gap:12px; }
+ .contact-option-card { padding:16px 12px; border-radius:14px; }
+ .contact-option-card dt { flex-direction:column; align-items:flex-start; gap:8px; margin-bottom:10px; font-size:11px; }
+ .contact-option-card dd { font-size:14px; }
+}
+@media(max-width:359px) {
+ .contact-options-grid { grid-template-columns:minmax(0,1fr); }
+ .contact-option-card { padding:16px; }
+ .contact-option-card dt { flex-direction:row; align-items:center; }
+ .contact-option-card dd { font-size:17px; }
+}
