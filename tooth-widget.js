@@ -8,6 +8,7 @@
   const fallback = document.getElementById('tooth-fallback');
   const failure = document.getElementById('tooth-failure');
   const hotspotLayer = document.getElementById('tooth-hotspots');
+  const hotspotDock = document.getElementById('hotspot-dock');
   const toggle = document.getElementById('cutaway-toggle');
   const badge = document.getElementById('view-badge');
   const actionButtons = document.querySelectorAll('.viewer-control');
@@ -27,6 +28,7 @@
     if (event.key === 'Escape') { hotspotNote.hidden = true; document.getElementById('tooth-canvas')?.focus(); }
   });
   let selectedPart = 'enamel';
+  let cutaway = true;
   let viewer = null;
   // Explanations remain usable even if WebGL or the local module is unavailable.
   function selectPart(part) {
@@ -39,7 +41,7 @@
     });
     if (viewer) {
       if (part === 'dentin' || part === 'pulp') {
-        toggle.checked = true;
+        cutaway = true;
         viewer.setCutaway();
       }
       viewer.highlight(part);
@@ -50,7 +52,7 @@
     button.addEventListener('click', () => {
       const part = button.dataset.part;
       selectPart(part);
-      hotspotNote.hidden = !button.classList.contains('tooth-hotspot');
+      hotspotNote.hidden = !(button.classList.contains('tooth-hotspot') || button.closest('#hotspot-dock'));
       document.getElementById('hotspot-note-title').textContent = parts[part][0];
       document.getElementById('hotspot-note-text').textContent = parts[part][1];
     });
@@ -67,9 +69,11 @@
     fallback.hidden = false;
     failure.hidden = false;
     hotspotLayer.hidden = true;
+    hotspotDock.hidden = true;
     hotspotNote.hidden = true;
     badge.hidden = true;
     toggle.disabled = true;
+    toggle.hidden = true;
     actionButtons.forEach(button => { button.disabled = true; });
     if (viewer) viewer.dispose();
     else cleanupPartial();
@@ -155,6 +159,7 @@
       const model = createTooth(THREE);
       scene.add(model.cutaway, model.intact);
       model.intact.visible = false;
+      let viewport = { left: 0, top: 0, width: 1, height: 1 };
       let frameId = 0;
       let visible = true;
       let disposed = false;
@@ -171,42 +176,123 @@
         connectors.append(line);
         return [button.dataset.part, line];
       }));
-      const offsets = { enamel: [62,-12], dentin: [66,8], pulp: [-62,-12], root: [60,0] };
       const raycaster = new THREE.Raycaster();
       const projected = new THREE.Vector3();
       const direction = new THREE.Vector3();
-      function positionHotspots() {
-        const width = stage.clientWidth, height = stage.clientHeight;
-        connectors.setAttribute('viewBox', `0 0 ${width} ${height}`);
-        const geometry = toggle.checked ? model.cutaway : model.intact;
-        for (const button of hotspots) {
-          const part = button.dataset.part;
-          const anchor = model.anchors[part];
+      const dockButtons = [...hotspotDock.querySelectorAll('button')];
+      hotspots.forEach(button => button.setAttribute('aria-label', parts[button.dataset.part][0]));
+      // Project the actual exterior, rather than using an angle-specific offset.
+      // Sampling every vertex stays conservative at rotated/zoomed silhouettes.
+      const outline = model.labelBounds || (() => {
+        const points = [];
+        model.intact.children.forEach(mesh => {
+          const position = mesh.geometry.attributes.position;
+          for (let i = 0; i < position.count; i++) points.push(new THREE.Vector3().fromBufferAttribute(position, i));
+        });
+        return points;
+      })();
+      let labelMetrics = null;
+      function measureLabels() {
+        labelMetrics = new Map();
+        hotspots.forEach(button => {
+          button.hidden = false;
+          button.classList.remove('is-compact');
+          labelMetrics.set(button.dataset.part, { width: button.offsetWidth, height: button.offsetHeight });
+        });
+      }
+      function visibleAnchor(part, geometry, width, height) {
+        const internal = part === 'dentin' || part === 'pulp';
+        if (internal && !cutaway) return null;
+        const candidates = (cutaway ? model.anchorCandidatesCutaway?.[part] : null) || model.anchorCandidates?.[part] || [model.anchors[part]];
+        const sorted = [...candidates].sort((a, b) => a.distanceToSquared(camera.position) - b.distanceToSquared(camera.position));
+        // The closest surface candidates are the likely front-facing ones.
+        // A ray must end on actual visible tissue: no labels on a removed quadrant.
+        for (const anchor of sorted.slice(0, 6)) {
           projected.copy(anchor).project(camera);
-          const x = (projected.x * .5 + .5) * width;
-          const y = (-projected.y * .5 + .5) * height;
+          const x = viewport.left + (projected.x * .5 + .5) * viewport.width;
+          const y = viewport.top + (-projected.y * .5 + .5) * viewport.height;
+          if (projected.z <= -1 || projected.z >= 1 || x < viewport.left || x > viewport.left + viewport.width || y < viewport.top || y > viewport.top + viewport.height) continue;
           direction.copy(anchor).sub(camera.position);
           const distance = direction.length();
           raycaster.set(camera.position, direction.normalize());
+          raycaster.far = distance + .06;
           const hit = raycaster.intersectObjects(geometry.children, false)[0];
-          const occluded = hit && hit.distance < distance - .12;
-          const internal = part === 'dentin' || part === 'pulp';
-          const show = projected.z < 1 && projected.z > -1 && x > 12 && x < width - 12 && y > 12 && y < height - 12 && !occluded && (toggle.checked || !internal);
-          button.hidden = !show;
-          button.tabIndex = show ? 0 : -1;
-          const line = lines.get(part);
-          line.style.display = show ? '' : 'none';
-          if (!show) continue;
-          const [ox, oy] = offsets[part];
-          const labelX = Math.max(44, Math.min(width - 44, x + ox));
-          const labelY = Math.max(42, Math.min(height - 28, y + oy));
-          button.style.left = `${labelX}px`;
-          button.style.top = `${labelY}px`;
-          line.setAttribute('x1', x);
-          line.setAttribute('y1', y);
-          line.setAttribute('x2', labelX);
-          line.setAttribute('y2', labelY);
+          if (hit && hit.object.userData.part === part && Math.abs(hit.distance - distance) < .06) return { x, y };
         }
+        return null;
+      }
+      function positionHotspots() {
+        const width = stage.clientWidth, height = stage.clientHeight;
+        if (!labelMetrics) measureLabels();
+        connectors.setAttribute('viewBox', `0 0 ${width} ${height}`);
+        const geometry = cutaway ? model.cutaway : model.intact;
+        const bounds = { left: Infinity, right: -Infinity, top: Infinity, bottom: -Infinity };
+        for (const point of outline) {
+          projected.copy(point).project(camera);
+          const x = viewport.left + (projected.x * .5 + .5) * viewport.width;
+          const y = viewport.top + (-projected.y * .5 + .5) * viewport.height;
+          bounds.left = Math.min(bounds.left, x); bounds.right = Math.max(bounds.right, x);
+          bounds.top = Math.min(bounds.top, y); bounds.bottom = Math.max(bounds.bottom, y);
+        }
+        // The clearance protects fine model details even at a grazing angle.
+        const margin = 8, clearance = 10, gap = 8;
+        const top = Math.max(margin, toggle.offsetTop + toggle.offsetHeight + gap);
+        const bottom = height - margin;
+        const available = {
+          left: bounds.left - clearance - margin,
+          right: width - margin - bounds.right - clearance
+        };
+        const rails = { left: [], right: [] };
+        const docked = new Set();
+        for (const button of hotspots) {
+          const part = button.dataset.part, line = lines.get(part);
+          const anchor = visibleAnchor(part, geometry, width, height);
+          line.style.display = 'none';
+          if (!anchor) { button.hidden = true; button.tabIndex = -1; continue; }
+          const metrics = labelMetrics.get(part);
+          let labelWidth = metrics.width;
+          let sides = ['left', 'right'].filter(side => available[side] >= labelWidth);
+          const compact = !sides.length;
+          if (compact) {
+            labelWidth = 44;
+            sides = ['left', 'right'].filter(side => available[side] >= labelWidth);
+          }
+          button.classList.toggle('is-compact', compact);
+          if (!sides.length) { button.hidden = true; button.tabIndex = -1; docked.add(part); continue; }
+          const preferred = anchor.x < (bounds.left + bounds.right) / 2 ? 'left' : 'right';
+          sides.sort((a, b) => (rails[a].length * 2 + (a === preferred ? 0 : 1)) - (rails[b].length * 2 + (b === preferred ? 0 : 1)));
+          const side = sides[0];
+          const x = side === 'left' ? bounds.left - clearance - labelWidth / 2 : bounds.right + clearance + labelWidth / 2;
+          rails[side].push({ button, line, anchor, x, y: anchor.y, height: metrics.height });
+        }
+        // Preserve the anchor order within each rail, then pack with real label
+        // heights. Forward/backward passes avoid collisions near crown and apex.
+        for (const lane of Object.values(rails)) {
+          lane.sort((a, b) => a.anchor.y - b.anchor.y);
+          let cursor = top;
+          for (const label of lane) {
+            label.y = Math.max(label.anchor.y, cursor + label.height / 2);
+            cursor = label.y + label.height / 2 + gap;
+          }
+          cursor = bottom;
+          for (let i = lane.length - 1; i >= 0; i--) {
+            const label = lane[i];
+            label.y = Math.min(label.y, cursor - label.height / 2);
+            cursor = label.y - label.height / 2 - gap;
+          }
+          for (const label of lane) {
+            if (label.y - label.height / 2 < top) { label.button.hidden = true; label.button.tabIndex = -1; docked.add(label.button.dataset.part); continue; }
+            label.button.hidden = false;
+            label.button.tabIndex = 0;
+            label.button.style.left = `${label.x}px`;
+            label.button.style.top = `${label.y}px`;
+            label.line.style.display = '';
+            label.line.setAttribute('x1', label.anchor.x); label.line.setAttribute('y1', label.anchor.y);
+            label.line.setAttribute('x2', label.x); label.line.setAttribute('y2', label.y);
+          }
+        }
+        hotspotDock.hidden = !docked.size;
+        dockButtons.forEach(button => { button.hidden = !docked.has(button.dataset.part); });
       }
       function invalidate() {
         if (!frameId && !disposed && visible && !document.hidden) frameId = requestAnimationFrame(render);
@@ -232,11 +318,15 @@
         if (changed || resetAnimation) invalidate();
       }
       function resize() {
+        labelMetrics = null;
         const width = stage.clientWidth, height = stage.clientHeight;
         if (!width || !height) return;
-        camera.aspect = width / height;
+        // A slim control area stays outside the canvas viewport, so the button
+        // cannot obscure anatomy at any orbit angle or zoom level.
+        viewport = { left: canvas.offsetLeft, top: canvas.offsetTop, width: canvas.clientWidth, height: canvas.clientHeight };
+        camera.aspect = viewport.width / viewport.height;
         camera.updateProjectionMatrix();
-        renderer.setSize(width, height, false);
+        renderer.setSize(viewport.width, viewport.height, false);
         invalidate();
       }
       const resizeObserver = new ResizeObserver(resize);
@@ -302,12 +392,19 @@
         if (keys[event.key]) { event.preventDefault(); keys[event.key](); }
       });
       function setCutaway() {
-        model.cutaway.visible = toggle.checked;
-        model.intact.visible = !toggle.checked;
-        badge.textContent = toggle.checked ? 'Анатомічний розріз' : 'Зовнішній вигляд';
+        model.cutaway.visible = cutaway;
+        model.intact.visible = !cutaway;
+        toggle.setAttribute('aria-pressed', String(cutaway));
+        toggle.title = cutaway ? 'Показати цілий зуб' : 'Показати анатомічний розріз';
+        badge.textContent = cutaway ? 'Анатомічний розріз' : 'Цілий зуб';
+        hotspotNote.hidden = true;
         invalidate();
       }
-      toggle.addEventListener('change', setCutaway);
+      toggle.addEventListener('click', () => {
+        if (toggle.disabled || !viewer) return;
+        cutaway = !cutaway;
+        setCutaway();
+      });
       function onMotionChange() {
         controls.enableDamping = !reducedMotion.matches;
         if (reducedMotion.matches && resetAnimation) { resetAnimation = null; reset(); }
@@ -355,6 +452,8 @@
       hotspotLayer.hidden = false;
       badge.hidden = false;
       actionButtons.forEach(button => { button.disabled = false; });
+      setCutaway();
+      toggle.hidden = false;
       toggle.disabled = false;
       viewer.highlight(selectedPart);
       invalidate();
